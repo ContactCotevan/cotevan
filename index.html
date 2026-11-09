@@ -1114,7 +1114,7 @@ const Compte = {
     user = mapUser(data.session?.user);
     sb.auth.onAuthStateChange((evt, session) => {
       user = mapUser(session?.user); apresAuth();
-      if (evt === "PASSWORD_RECOVERY") ouvrirAuth("reset");
+      if (evt === "PASSWORD_RECOVERY" && authMode !== "reset-ok" && authMode !== "reset") ouvrirAuth("reset");
     });
   },
   async signUp(email, pw){
@@ -1234,24 +1234,25 @@ function ouvrirAuth(mode){
 }
 function fermerAuth(){
   $("auth").hidden = true;
-  if (authMode === "reset") authMode = "login";   /* on ne garde pas l'écran « nouveau mot de passe » ouvert par erreur */
+  if (authMode === "reset" || authMode === "reset-ok") authMode = "login";   /* on ne garde pas l'écran « nouveau mot de passe » ouvert par erreur */
 }
 function majAuth(){
-  const su = authMode === "signup", oubli = authMode === "forgot", reset = authMode === "reset", log = authMode === "login";
+  const fini = authMode === "reset-ok";
+  const su = authMode === "signup", oubli = authMode === "forgot", reset = authMode === "reset" || fini, log = authMode === "login";
   const special = oubli || reset;
   $("auth-google").hidden = !GOOGLE_ACTIF || special; document.querySelector(".or").hidden = !GOOGLE_ACTIF || special;
   $("auth-mode").hidden = special;
   $("lbl-email").hidden = reset;
-  $("lbl-pw").hidden = oubli;
-  $("lbl-pw2").hidden = !reset;
+  $("lbl-pw").hidden = oubli || fini;
+  $("lbl-pw2").hidden = !reset || fini;
   $("auth-oubli").hidden = !log;
   $("auth-retour").hidden = !oubli;
-  $("auth-intro").hidden = !special;
+  $("auth-intro").hidden = !special || fini;
   $("auth-intro").textContent = oubli ? "Entrez l'e-mail de votre compte : nous vous envoyons un lien pour choisir un nouveau mot de passe."
     : reset ? "Choisissez votre nouveau mot de passe." : "";
   $("auth-pw-txt").textContent = reset ? "Nouveau mot de passe" : "Mot de passe";
-  $("auth-title").textContent = su ? "Créer un compte gratuit" : oubli ? "Mot de passe oublié" : reset ? "Nouveau mot de passe" : "Se connecter";
-  $("auth-submit").textContent = su ? "Créer mon compte" : oubli ? "Recevoir le lien" : reset ? "Enregistrer" : "Me connecter";
+  $("auth-title").textContent = su ? "Créer un compte gratuit" : oubli ? "Mot de passe oublié" : fini ? "Mot de passe modifié" : reset ? "Nouveau mot de passe" : "Se connecter";
+  $("auth-submit").textContent = su ? "Créer mon compte" : oubli ? "Recevoir le lien" : fini ? "Accéder à mon espace" : reset ? "Enregistrer" : "Me connecter";
   $("auth-pw").autocomplete = log ? "current-password" : "new-password";
   $("auth-mode").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === authMode));
   $("auth-fine").textContent = DEMO
@@ -1269,6 +1270,7 @@ $("auth-google").addEventListener("click", async () => { try { await Compte.goog
 $("auth-form").addEventListener("submit", async e => {
   e.preventDefault();
   const email = $("auth-email").value.trim().toLowerCase(), pw = $("auth-pw").value;
+  if (authMode === "reset-ok") { fermerAuth(); authMode = "login"; location.hash = "mon-espace"; return; }
   if (authMode === "reset") {
     if (pw.length < 8) return authMsg("Le mot de passe doit contenir au moins 8 caractères.", true);
     if (pw !== $("auth-pw2").value) return authMsg("Les deux mots de passe ne correspondent pas.", true);
@@ -1276,9 +1278,10 @@ $("auth-form").addEventListener("submit", async e => {
     try {
       await Compte.nouveauMdp(pw);
       $("auth-pw").value = $("auth-pw2").value = "";
-      authMsg("Mot de passe modifié. Vous êtes connecté.");
       await apresAuth();
-      setTimeout(() => { fermerAuth(); location.hash = "mon-espace"; }, 1500);
+      authMode = "reset-ok"; majAuth();
+      authMsg("C'est fait : votre nouveau mot de passe est enregistré et vous êtes connecté.");
+      $("auth-submit").focus();
     } catch (err) { authMsg(err.message, true); }
     finally { $("auth-submit").disabled = false; }
     return;
@@ -1866,7 +1869,7 @@ window.addEventListener("hashchange", route);
 route();
 
 Compte.init().then(apresAuth).then(retourPaiement).then(() => {
-  if (RETOUR_MDP === "ok" && user) ouvrirAuth("reset");
+  if (RETOUR_MDP === "ok" && user && authMode !== "reset") ouvrirAuth("reset");
   else if (RETOUR_MDP === "expire") { ouvrirAuth("forgot"); authMsg("Ce lien a expiré ou a déjà servi. Redemandez-en un ci-dessous.", true); }
   if (RETOUR_MDP) history.replaceState(null, "", location.pathname + (location.hash.includes("=") ? "" : location.hash));
 });
