@@ -338,6 +338,12 @@ label.check input{width:auto}
   #nav-compte{order:2;white-space:nowrap}
   .logo{order:1}
 }
+
+.banner{position:sticky;top:65px;z-index:9;text-align:center;padding:12px 16px;font-weight:700;background:var(--blue-soft);color:var(--blue)}
+.banner.ok{background:color-mix(in srgb,var(--good) 14%, #fff);color:var(--good)}
+.banner.warn{background:color-mix(in srgb,var(--warn) 14%, #fff);color:var(--warn)}
+.pro-sub{display:grid;gap:10px;justify-items:start;padding:16px;border-radius:14px;background:var(--blue-soft)}
+.pro-sub p{font-size:14px;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -356,6 +362,7 @@ label.check input{width:auto}
   </nav>
 </div></div>
 
+<div class="banner" id="banner" role="status" hidden></div>
 <main>
 <div class="page" data-page id="accueil">
 <div class="hero-bg"><div class="wrap">
@@ -683,14 +690,15 @@ label.check input{width:auto}
         <h3>Rapport</h3>
         <div class="price">4,90 € <small>/ véhicule</small></div>
         <ul><li>Prix maximum conseillé</li><li>Tous les points à vérifier</li><li>Offre d'ouverture et arguments chiffrés</li><li>3 messages prêts à envoyer au vendeur</li></ul>
-        <a class="btn ghost" href="#rejoindre">Choisir</a>
+        <a class="btn ghost" href="#acheter">Analyser un véhicule</a>
       </div>
       <div class="plan hot">
         <span class="tag">Le plus choisi</span>
         <h3>Pass Recherche</h3>
         <div class="price">19 € <small>/ 60 jours</small></div>
         <ul><li>Rapports complets illimités pendant 60 jours</li><li>Alerte chaque matin sur les annonces sous la cote</li><li>Comparaison France / Allemagne avec frais d'import</li><li>Paiement unique, sans renouvellement</li></ul>
-        <a class="btn" href="#rejoindre">Commencer</a>
+        <button class="btn" type="button" data-pay="pass">Prendre le Pass</button>
+        <p class="gate-msg"></p>
       </div>
       <div class="plan">
         <h3>Rapport vendeur</h3>
@@ -811,6 +819,12 @@ label.check input{width:auto}
       <div class="panel">
         <h3>Vous êtes revendeur de camping-cars ou de vans ?</h3>
         <ul class="checks"><li>Vos véhicules montrés aux acheteurs qui cherchent ce modèle</li><li>Photo et lien direct vers votre catalogue ou votre annonce</li><li>Le nombre de demandes des acheteurs, par type de véhicule</li><li>Abonnement Revendeur : 29 € par mois, sans engagement</li></ul>
+        <div class="pro-sub">
+          <p><b>Activez votre espace pro tout de suite</b> : abonnement mensuel, résiliable à tout moment.</p>
+          <button class="btn" type="button" data-pay="pro">S'abonner · 29 € par mois</button>
+          <p class="gate-msg"></p>
+        </div>
+        <p class="muted" style="margin:4px 0 0">Une question avant de vous lancer ? Laissez-nous vos coordonnées.</p>
         <form id="pro-form" class="pro-contact" novalidate>
           <label for="pc-nom">Nom du garage<input id="pc-nom" type="text" autocomplete="organization"></label>
           <label for="pc-email">E-mail<input id="pc-email" type="email" autocomplete="email"></label>
@@ -822,6 +836,7 @@ label.check input{width:auto}
     </div>
 
     <div id="pro-in" hidden>
+      <p><a class="btn small ghost" id="portail" href="#" target="_blank" rel="noopener" hidden>Gérer mon abonnement (factures, résiliation)</a></p>
       <div class="esp-block">
         <h2 class="h2s">Ce que cherchent les acheteurs</h2>
         <div class="demandes" id="demandes"></div>
@@ -1068,6 +1083,8 @@ const SUPABASE_ANON_KEY = "sb_publishable_v-wS7qE5eglBG9J0iIYiSA_ecXkSWJv";
 /* Liens de paiement Stripe (Payment Links). Vides = paiement pas encore ouvert. */
 const PAIEMENT_RAPPORT = "";
 const PAIEMENT_PASS = "";
+const PAIEMENT_PRO = "";       /* abonnement Revendeur 29 €/mois */
+const PORTAIL_CLIENT = "";     /* lien du portail client Stripe (gérer / résilier l'abonnement) */
 /* Passer à true une fois Google activé dans Supabase (Authentication → Providers → Google) */
 const GOOGLE_ACTIF = false;
 
@@ -1143,6 +1160,16 @@ const Compte = {
     const { error } = await sb.from("rapports").insert({ vehicule, donnees });
     if (error) throw new Error("Le rapport n'a pas pu être enregistré.");
   },
+  async deblocages(){
+    if (!user || DEMO || INDISPO) return [];
+    const { data, error } = await sb.from("deblocages").select("cle");
+    return error ? [] : data.map(x => x.cle);
+  },
+  async rafraichir(){
+    if (DEMO || INDISPO) return;
+    const { data } = await sb.auth.refreshSession();
+    if (data && data.user) user = mapUser(data.user);
+  },
   async supprimer(id){
     if (INDISPO) throw errIndispo();
     if (DEMO) { const k = "cv_demo_rapports_" + user.id; store.set(k, store.get(k, []).filter(r => r.id !== id)); return; }
@@ -1150,7 +1177,13 @@ const Compte = {
     if (error) throw new Error("La suppression a échoué.");
   }
 };
-function mapUser(u){ return u ? { id: u.id, email: u.email, premium: !!(u.app_metadata && u.app_metadata.premium), pro: !!(u.app_metadata && u.app_metadata.pro) } : null; }
+function mapUser(u){
+  if (!u) return null;
+  const m = u.app_metadata || {};
+  const fin = m.premium_until ? new Date(m.premium_until) : null;
+  const passActif = !!(fin && fin > new Date());
+  return { id: u.id, email: u.email, premium: m.premium === true || passActif, passFin: passActif ? fin : null, pro: !!m.pro };
+}
 function traduire(m){
   if (/Invalid login/i.test(m)) return "E-mail ou mot de passe incorrect.";
   if (/already registered|already been registered/i.test(m)) return "Un compte existe déjà avec cet e-mail. Connectez-vous.";
@@ -1159,6 +1192,14 @@ function traduire(m){
   return "Une erreur est survenue. Réessayez dans un instant.";
 }
 const niveau = () => !user ? 0 : (user.premium ? 2 : 1);
+let mesDeblocages = new Set();
+/* Clé courte qui identifie un véhicule analysé (sert au déblocage d'un rapport à l'unité) */
+function cleRapport(){
+  const e = entrees(), t = [e.type, e.marque, e.autre, e.annee, e.km, e.prix, e.vendeur, e.pays].join("|");
+  let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
+const niveauRapport = () => niveau() === 1 && mesDeblocages.has(cleRapport()) ? 2 : niveau();
 
 /* ---------- Fenêtre de connexion ---------- */
 let authMode = "signup";
@@ -1206,11 +1247,7 @@ $("auth-form").addEventListener("submit", async e => {
 document.addEventListener("click", e => {
   const a = e.target.closest("[data-auth]"); if (a) ouvrirAuth(a.dataset.auth);
   const pay = e.target.closest("[data-pay]");
-  if (pay) {
-    const lien = pay.dataset.pay === "pass" ? PAIEMENT_PASS : PAIEMENT_RAPPORT;
-    if (lien) location.href = lien + (user ? "?prefilled_email=" + encodeURIComponent(user.email) : "");
-    else { const gm = pay.closest(".gate")?.querySelector(".gate-msg"); if (gm) gm.textContent = "Le paiement ouvre très bientôt. Vous serez prévenu par e-mail."; }
-  }
+  if (pay) payer(pay.dataset.pay, pay.closest(".gate, .panel, .plan")?.querySelector(".gate-msg"));
 });
 $("nav-compte").addEventListener("click", () => {
   if (user) location.hash = "#mon-espace"; else ouvrirAuth("login");
@@ -1227,8 +1264,9 @@ async function apresAuth(){
   if (user) await afficherRecherches(); else mesRecherches = [];
   const pageActive = document.querySelector("[data-page]:not([hidden])");
   if (pageActive) surPage(pageActive.id);
+  mesDeblocages = user ? new Set(await Compte.deblocages()) : new Set();
   if (user) {
-    $("esp-who").textContent = "Connecté avec " + user.email + (user.premium ? " · accès complet" : " · compte gratuit");
+    $("esp-who").textContent = "Connecté avec " + user.email + (user.passFin ? " · Pass Recherche actif jusqu'au " + user.passFin.toLocaleDateString("fr-FR", { day: "numeric", month: "long" }) : user.premium ? " · accès complet" : " · compte gratuit") + (user.pro ? " · compte revendeur" : "");
     await afficherRapports();
   }
   if (dernierRapport && !$("r-content").hidden) { rendre(dernierRapport.d, dernierRapport.r); await sauver(); }
@@ -1239,7 +1277,7 @@ const MASQUE = "•• ••• €";
 const arrondi = n => Math.round(n / 100) * 100;
 function rendre(d, r){
   dernierRapport = { d, r };
-  const lvl = niveau();
+  const lvl = niveauRapport();
   $("lock1").classList.toggle("locked", lvl === 0);
   $("lock2").classList.toggle("locked", lvl === 1);
   $("r-saved").textContent = "";
@@ -1658,6 +1696,7 @@ $("rech-form").addEventListener("submit", async e => {
 async function majPro(){
   const estPro = !!(user && user.pro);
   $("pro-out").hidden = estPro; $("pro-in").hidden = !estPro;
+  if (PORTAIL_CLIENT) { $("portail").href = PORTAIL_CLIENT + (user ? "?prefilled_email=" + encodeURIComponent(user.email) : ""); $("portail").hidden = false; }
   if (user && !$("pc-email").value) $("pc-email").value = user.email;
   if (!estPro) return;
   try {
@@ -1708,6 +1747,46 @@ function surPage(id){
   if (id === "espace-pro") majPro();
 }
 
+/* ---------- Paiement Stripe ----------
+   L'identifiant envoyé à Stripe (client_reference_id) dit à Supabase quoi débloquer :
+   <id utilisateur>__pass · <id>__pro · <id>__r-<clé du rapport> */
+function payer(quoi, msgEl){
+  const dire = t => { if (msgEl) msgEl.textContent = t; };
+  if (!user) { ouvrirAuth("signup"); authMsg("Créez votre compte (ou connectez-vous) pour continuer vers le paiement."); return; }
+  const lien = { rapport: PAIEMENT_RAPPORT, pass: PAIEMENT_PASS, pro: PAIEMENT_PRO }[quoi];
+  if (!lien) { dire("Le paiement ouvre très bientôt. Vous serez prévenu par e-mail."); return; }
+  let ref = user.id + "__" + quoi;
+  if (quoi === "rapport") {
+    if (!dernierRapport) { location.hash = "#acheter"; return; }
+    ref = user.id + "__r-" + cleRapport();
+  }
+  if (quoi !== "pro" && dernierRapport) store.set("cv_attente", entrees());
+  location.href = lien + "?client_reference_id=" + encodeURIComponent(ref) + "&prefilled_email=" + encodeURIComponent(user.email);
+}
+/* Retour depuis Stripe : ?paiement=rapport|pass|pro */
+async function retourPaiement(){
+  const quoi = new URLSearchParams(location.search).get("paiement");
+  if (!quoi) return;
+  history.replaceState(null, "", location.pathname + location.hash);
+  const b = $("banner");
+  b.hidden = false; b.className = "banner"; b.textContent = "Paiement reçu. Activation de votre accès en cours…";
+  for (let i = 0; i < 8 && !DEMO; i++) {
+    await Compte.rafraichir();
+    mesDeblocages = new Set(await Compte.deblocages());
+    const ok = quoi === "pro" ? user && user.pro : quoi === "pass" ? user && user.premium : mesDeblocages.size > 0;
+    if (ok) break;
+    await new Promise(r => setTimeout(r, 2500));
+  }
+  const attente = store.get("cv_attente", null);
+  store.set("cv_attente", null);
+  await apresAuth();
+  if (attente && quoi !== "pro") ouvrirRapport({ donnees: attente });
+  const ok = quoi === "pro" ? user && user.pro : quoi === "pass" ? user && user.premium : mesDeblocages.size > 0;
+  b.className = "banner " + (ok ? "ok" : "warn");
+  b.textContent = ok ? "Merci ! Votre accès est activé." : "Paiement reçu. L'activation prend un peu plus de temps que prévu : rechargez la page dans une minute.";
+  setTimeout(() => { b.hidden = true; }, 9000);
+}
+
 /* ---------- Pages (navigation par #adresse) ---------- */
 const TITRES = { offres: "Offres des revendeurs · Cotevan", "espace-pro": "Espace pro · Cotevan", accueil: "Cotevan", acheter: "Estimer un achat · Cotevan", louer: "Comparer une location · Cotevan", "tarifs-page": "Tarifs · Cotevan", "faq-page": "FAQ · Cotevan", "mon-espace": "Mon espace · Cotevan" };
 function route(){
@@ -1725,7 +1804,7 @@ function route(){
 window.addEventListener("hashchange", route);
 route();
 
-Compte.init().then(apresAuth);
+Compte.init().then(apresAuth).then(retourPaiement);
 </script>
 </body>
 </html>
