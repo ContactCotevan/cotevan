@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cotevan</title>
+<meta name="description" content="Cotevan estime la vraie valeur d'un camping-car ou d'un van d'occasion, repère les points faibles du modèle et vous dit combien négocier.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%231d5bd8'/%3E%3Cpath d='M33.5 14.5A13 13 0 1 0 33.5 33.5' fill='none' stroke='%23fff' stroke-width='4.2' stroke-linecap='round'/%3E%3Cpath d='M24 24L33 18' stroke='%23fff' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='24' cy='24' r='3.2' fill='%23fff'/%3E%3C/svg%3E">
+<style>
+/* Layout idea: clean white page, one confident blue, the product (a report card) shown in the hero; trust through calm spacing and clear numbers. */
+:root{
+  --ink:#0b1f3a;          /* navy text */
+  --paper:#ffffff;
+  --tint:#f3f7fd;         /* pale blue sections */
+  --card:#ffffff;
+  --muted:#5a6b85;
+  --line:#dde6f2;
+  --blue:#1d5bd8;         /* the one accent */
+  --blue-dark:#1546a8;
+  --blue-soft:#e6efff;
+  --good:#16865a; --warn:#c27a12; --bad:#c43c33;
+  --display:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --body:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto} *{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 var(--body)}
+a{color:inherit}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--blue) 45%, transparent);outline-offset:2px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1;letter-spacing:-.02em}
+h2{font-size:clamp(28px,3.8vw,40px);font-weight:800}
+h3{font-size:19px;font-weight:700;letter-spacing:-.01em}
+p{margin:0}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* nav */
+.topbar{position:sticky;top:0;z-index:10;background:color-mix(in srgb,#fff 88%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font:800 22px var(--display);letter-spacing:-.03em;color:var(--ink)}
+.logo svg{width:36px;height:36px;flex:none}
+.logo .wm span{color:var(--blue)}
+.navlinks{display:flex;gap:26px;align-items:center;font-size:15px;font-weight:600}
+.navlinks a{text-decoration:none;color:var(--muted)}
+.navlinks a:hover{color:var(--blue)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--blue);background:var(--blue);color:#fff;padding:12px 22px;border-radius:12px;font:700 16px var(--body);cursor:pointer;text-decoration:none;transition:background .15s, transform .15s, box-shadow .15s;box-shadow:0 6px 16px -8px color-mix(in srgb,var(--blue) 70%, transparent)}
+.btn:hover{background:var(--blue-dark);transform:translateY(-1px)}
+.btn.ghost{background:#fff;color:var(--blue);box-shadow:none}
+.btn.ghost:hover{background:var(--blue-soft)}
+.navlinks .btn{color:#fff}
+.btn.small{padding:9px 16px;font-size:14px}
+@media (max-width:640px){.navlinks a:not(.btn){display:none}}
+
+/* hero */
+.hero-bg{background:radial-gradient(1000px 420px at 85% -10%, var(--blue-soft), transparent 70%), linear-gradient(#fff, var(--tint))}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center;padding:56px 0 72px}
+.kicker{display:inline-flex;gap:8px;align-items:center;font:700 13px var(--body);letter-spacing:.02em;color:var(--blue);background:var(--blue-soft);padding:6px 12px;border-radius:999px}
+.kicker i{width:8px;height:8px;border-radius:50%;background:var(--blue);display:inline-block}
+.hero h1{font-size:clamp(38px,5.4vw,60px);font-weight:800;margin:20px 0 18px;letter-spacing:-.035em}
+.hero h1 em{font-style:normal;color:var(--blue)}
+.lede{font-size:19px;max-width:32em;color:var(--muted)}
+.lede strong{color:var(--ink)}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.trust{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:22px;font-size:14px;color:var(--muted);list-style:none;padding:0}
+.trust li{display:flex;gap:8px;align-items:center}
+.trust li::before{content:"";width:16px;height:16px;border-radius:50%;background:var(--blue-soft) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.2l2.2 2.2 4.8-4.8' fill='none' stroke='%231d5bd8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat}
+
+/* report card */
+.cg{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 30px 60px -30px rgba(17,52,120,.35)}
+.cg-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 18px;background:var(--tint);border-bottom:1px solid var(--line);font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.cg-body{padding:20px 18px;display:grid;gap:14px}
+.cg-title{font-family:var(--display);font-weight:800;font-size:21px;letter-spacing:-.02em}
+.fields{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.field{background:var(--tint);border-radius:10px;padding:8px 10px}
+.field span{display:block;font:600 10px var(--mono);color:var(--muted);letter-spacing:.05em}
+.field strong{font:600 14px var(--mono)}
+.verdict{display:flex;justify-content:space-between;align-items:end;gap:12px;padding:14px;border-radius:12px;background:color-mix(in srgb,var(--good) 9%, #fff);border:1px solid color-mix(in srgb,var(--good) 25%, #fff)}
+.verdict .big{font:700 clamp(22px,6vw,28px) var(--mono);color:var(--good);white-space:nowrap}
+.pill{display:inline-block;padding:4px 10px;border-radius:999px;font:700 12px var(--body);letter-spacing:.01em}
+.pill.good{background:color-mix(in srgb,var(--good) 14%, #fff);color:var(--good)}
+.pill.warn{background:color-mix(in srgb,var(--warn) 15%, #fff);color:var(--warn)}
+.pill.bad{background:color-mix(in srgb,var(--bad) 13%, #fff);color:var(--bad)}
+.checks{list-style:none;margin:0;padding:0;display:grid;gap:7px;font-size:14px}
+.checks li{display:flex;gap:9px}
+.checks li::before{content:"";flex:0 0 7px;height:7px;margin-top:8px;border-radius:50%;background:var(--blue)}
+.cg-foot{font-size:12px;color:var(--muted);padding:0 18px 16px}
+@media (max-width:860px){.hero{grid-template-columns:1fr;gap:40px;padding-top:36px}}
+
+/* sections */
+section{padding:84px 0;scroll-margin-top:64px}
+#rejoindre{scroll-margin-top:64px}
+section.alt{background:var(--tint)}
+.sec-head{display:grid;gap:12px;max-width:44em;margin-bottom:40px}
+.sec-head p{color:var(--muted);font-size:18px}
+.eyebrow{font:700 13px var(--body);color:var(--blue);letter-spacing:.04em;text-transform:uppercase}
+
+/* facts */
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.fact{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px}
+.fact .n{font:800 clamp(30px,3.4vw,40px) var(--display);letter-spacing:-.03em;color:var(--blue)}
+.fact p{margin-top:8px;color:var(--muted);font-size:15px}
+.fact a{display:inline-block;margin-top:10px;font-size:13px;color:var(--muted)}
+@media (max-width:760px){.facts{grid-template-columns:1fr}}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:s}
+.step{padding:26px;background:#fff;border:1px solid var(--line);border-radius:16px}
+.step::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:var(--blue-soft);color:var(--blue);font:800 16px var(--display);margin-bottom:16px}
+.step p{margin-top:8px;color:var(--muted);font-size:15px}
+@media (max-width:760px){.steps{grid-template-columns:1fr}}
+
+/* estimator */
+.demo{display:grid;grid-template-columns:.95fr 1.05fr;gap:24px;align-items:start}
+.panel{background:#fff;border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 20px 40px -32px rgba(17,52,120,.4)}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form .full{grid-column:1/-1}
+label{display:grid;gap:6px;font-size:14px;font-weight:700}
+input,select{font:16px var(--body);color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;transition:border-color .15s, box-shadow .15s}
+input:focus,select:focus{border-color:var(--blue);outline:none;box-shadow:0 0 0 4px var(--blue-soft)}
+.seg{display:flex;background:var(--tint);border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);padding:9px;font:700 14px var(--body);cursor:pointer;border-radius:9px}
+.seg button[aria-pressed="true"]{background:#fff;color:var(--blue);box-shadow:0 1px 3px rgba(11,31,58,.12)}
+.result{display:grid;gap:16px}
+.range{position:relative;height:56px;margin-top:6px}
+.range .bar{position:absolute;top:22px;left:0;right:0;height:10px;border-radius:6px;background:linear-gradient(90deg,var(--good),var(--warn) 50%,var(--bad))}
+.range .mk{position:absolute;top:10px;width:4px;height:34px;background:var(--ink);border-radius:2px;transform:translateX(-50%);transition:left .3s}
+.range .mk span{position:absolute;top:-8px;left:8px;white-space:nowrap;font:700 12px var(--body)}
+.range .ends{position:absolute;top:40px;left:0;right:0;display:flex;justify-content:space-between;font:600 12px var(--mono);color:var(--muted)}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.kv div{background:var(--tint);border-radius:12px;padding:12px}
+.kv span{display:block;font-size:12px;color:var(--muted)}
+.kv strong{font:700 18px var(--mono);white-space:nowrap}
+.note{font-size:13px;color:var(--muted)}
+.empty{display:grid;justify-items:center;text-align:center;gap:10px;padding:48px 16px;border:1.5px dashed var(--line);border-radius:16px;background:var(--tint)}
+.empty-ico svg{width:56px;height:56px;opacity:.9}
+.empty p{color:var(--muted);font-size:15px;max-width:26em}
+.import{background:color-mix(in srgb,var(--warn) 8%, #fff);border:1px solid color-mix(in srgb,var(--warn) 30%, #fff);border-radius:12px;padding:12px;font-size:14px}
+@media (max-width:860px){.demo{grid-template-columns:1fr}}
+@media (max-width:480px){.form{grid-template-columns:1fr}.kv{grid-template-columns:1fr 1fr}.fields{grid-template-columns:1fr 1fr}}
+.paste{grid-column:1/-1;display:grid;gap:8px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.paste-row{display:flex;gap:8px}
+.paste-row textarea{flex:1;font:15px var(--body);color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;min-height:46px;resize:vertical}
+.paste-row textarea:focus{border-color:var(--blue);outline:none;box-shadow:0 0 0 4px var(--blue-soft)}
+.paste-msg{font-size:13px;color:var(--muted);min-height:18px}
+@media (max-width:480px){.paste-row{flex-direction:column;align-items:stretch!important}.plate{max-width:none}}
+.mode{grid-column:1/-1}
+.plate{display:flex;align-items:stretch;border:2.5px solid #111;border-radius:8px;overflow:hidden;background:#fff;max-width:340px}
+.plate .eu{background:#003399;color:#fff;width:38px;display:grid;place-items:center;font:700 16px var(--display);padding:4px 0}
+.plate .eu small{display:block;color:#ffcc00;font-size:10px;letter-spacing:2px}
+.plate input{border:0;border-radius:0;background:#fff;color:#111;font:800 26px var(--display);letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:8px 6px;box-shadow:none}
+.plate input:focus{outline:none;box-shadow:none}
+.plate .dep{background:#003399;width:22px}
+
+/* pricing */
+.plans{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.plan{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:14px}
+.plan.hot{border:2px solid var(--blue);box-shadow:0 24px 48px -28px color-mix(in srgb,var(--blue) 70%, transparent)}
+.plan .price{font:800 30px var(--display);letter-spacing:-.03em;white-space:nowrap}
+.plan .price small{display:block;font:500 13px var(--body);color:var(--muted);letter-spacing:0;margin-top:2px}
+.plan ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:14.5px;flex:1;align-content:start}
+.plan li{display:flex;gap:8px}
+.plan li::before{content:"✓";font-weight:800;color:var(--blue)}
+.tag{align-self:start;background:var(--blue);color:#fff;font:700 11px var(--body);padding:4px 10px;border-radius:999px;letter-spacing:.02em}
+.math{margin-top:24px;font-size:16px;max-width:44em;color:var(--muted)}
+@media (max-width:1060px){.plans{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:760px){.plans{grid-template-columns:1fr 1fr}}
+@media (max-width:540px){.plans{grid-template-columns:1fr}}
+
+/* faq */
+.faq{max-width:780px}
+details{border-bottom:1px solid var(--line);padding:18px 0}
+summary{cursor:pointer;font-weight:700;font-size:17px;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--blue);font-weight:800;font-size:22px;line-height:1}
+details[open] summary::after{content:"–"}
+details p{margin-top:10px;color:var(--muted);max-width:46em}
+
+/* waitlist */
+.join{background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;border-radius:24px;padding:44px;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
+.join h2{color:#fff}
+.join p{color:rgba(255,255,255,.82);margin-top:12px}
+.join form{display:grid;gap:12px}
+.join label{color:#fff}
+.join input,.join select{border-color:transparent}
+.join .btn{background:#fff;color:var(--blue);border-color:#fff}
+.join .btn:hover{background:var(--blue-soft)}
+.msg{font-size:14px;min-height:20px;color:#fff}
+@media (max-width:760px){.join{grid-template-columns:1fr;padding:28px}}
+footer{padding:40px 0 50px;font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between;align-items:center}
+footer .logo{font-size:17px}
+footer .logo svg{width:26px;height:26px}
+
+/* rental */
+.loc{display:grid;grid-template-columns:.8fr 1.2fr;gap:24px;align-items:start}
+.loc .form{grid-template-columns:1fr 1fr}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.offer{border:1.5px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:10px;position:relative;align-content:start}
+.offer.best{border-color:var(--blue);box-shadow:0 16px 32px -24px color-mix(in srgb,var(--blue) 80%, transparent)}
+.offer .tag{position:absolute;top:-11px;left:16px}
+.offer h3{font-size:17px}
+.offer .sub{font-size:13px;color:var(--muted)}
+.offer .total{font:800 30px var(--display);letter-spacing:-.03em;color:var(--ink)}
+.offer .total small{display:block;font:500 13px var(--body);color:var(--muted);letter-spacing:0}
+.lines{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:14px}
+.lines li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px dashed var(--line);padding-bottom:6px}
+.lines li span:last-child{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.lines li.txt span:last-child{font-family:var(--body);font-weight:600}
+.verdict-loc{background:var(--blue-soft);border-radius:12px;padding:12px 14px;font-size:15px}
+.platforms{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:28px}
+.pf{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.pf .kind{font:700 11px var(--body);letter-spacing:.04em;text-transform:uppercase;color:var(--blue)}
+.pf ul{list-style:none;margin:0;padding:0;display:grid;gap:7px;font-size:14px;color:var(--muted);flex:1;align-content:start}
+.pf li::before{content:"· ";color:var(--blue);font-weight:800}
+.pf a.more{font-size:14px;font-weight:700;color:var(--blue);text-decoration:none}
+.pf a.more:hover{text-decoration:underline}
+@media (max-width:1060px){.platforms{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:860px){.loc{grid-template-columns:1fr}}
+@media (max-width:640px){.compare,.platforms{grid-template-columns:1fr}.loc .form{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="topbar"><div class="wrap">
+  <nav>
+    <a class="logo" href="#top" aria-label="Cotevan, accueil"><svg viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f6ff0"/><stop offset="1" stop-color="#1546a8"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="url(#lg)"/><path d="M33.5 14.5A13 13 0 1 0 33.5 33.5" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round"/><path d="M24 24L33 18" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="24" r="3.2" fill="#fff"/></svg><span class="wm">cote<span>van</span></span></a>
+    <div class="navlinks">
+      <a href="#estimer">Acheter</a>
+      <a href="#louer">Louer</a>
+      <a href="#tarifs">Tarifs</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn small" href="#rejoindre">Accès anticipé</a>
+    </div>
+  </nav>
+</div></div>
+<div class="hero-bg"><div class="wrap">
+
+  <header class="hero" id="top">
+    <div>
+      <span class="kicker"><i></i>Achat et location · Camping-cars, fourgons, vans</span>
+      <h1>Le bon camping‑car, <em>au bon prix.</em></h1>
+      <p class="lede">Collez une annonce ou une plaque. Cotevan vous donne <strong>la vraie valeur du véhicule</strong>, les points faibles à vérifier et le prix maximum à proposer.</p>
+      <div class="cta">
+        <a class="btn" href="#estimer">Estimer un achat</a>
+        <a class="btn ghost" href="#louer">Comparer une location</a>
+      </div>
+      <ul class="trust"><li>Aperçu gratuit</li><li>Sans carte bancaire</li><li>Sans abonnement</li></ul>
+    </div>
+
+    <article class="cg" aria-label="Exemple de rapport Cotevan">
+      <div class="cg-head"><span>Rapport · exemple</span><span>J.1 VASP · J.2 AUTOCARAVANE</span></div>
+      <div class="cg-body">
+        <div class="cg-title">Profilé 7 m · Fiat Ducato 2.3 140 ch</div>
+        <div class="fields">
+          <div class="field"><span>B · 1ʳᵉ IMMAT.</span><strong>2019</strong></div>
+          <div class="field"><span>KM</span><strong>58 000</strong></div>
+          <div class="field"><span>F.2 · PTAC</span><strong>3 500 kg</strong></div>
+        </div>
+        <div class="verdict">
+          <div><span class="pill good">Bonne affaire</span><p class="note" style="margin-top:8px">Prix demandé 38 900 € · cote 41 970 €</p></div>
+          <div class="big num">−3 070 €</div>
+        </div>
+        <ul class="checks">
+          <li>Taux d'humidité de la cellule : exiger le dernier contrôle d'étanchéité</li>
+          <li>Ducato 2.3 : vérifier l'historique de l'embrayage et de la distribution</li>
+          <li>Pneus : contrôler la date DOT, à changer après 6 ans même peu usés</li>
+        </ul>
+      </div>
+      <p class="cg-foot">Exemple d'illustration. Les chiffres ne décrivent pas une annonce réelle.</p>
+    </article>
+  </header>
+</div></div>
+
+<section id="pourquoi">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Le marché</span>
+      <h2>Un marché où une erreur coûte cher</h2>
+      <p>Un camping-car se paie le prix d'un appartement en province, et sa cote dépend de la marque, de l'implantation et de l'état de la cellule. Les cotes auto classiques ne savent pas lire tout ça.</p>
+    </div>
+    <div class="facts">
+      <div class="fact"><div class="n">68 463</div><p>véhicules de loisirs d'occasion vendus en France en 2023.</p><a href="https://www.wikicampers.fr/blog/statistiques-des-ventes-de-camping-cars-vans-et-fourgons-neufs-et-doccasion/">Source : Wikicampers</a></div>
+      <div class="fact"><div class="n">83 370 €</div><p>prix moyen d'un camping-car neuf en France, millésime 2026.</p><a href="https://openvan.camp/en/news/industry/collections-2026-le-prix-moyen-des-campingcars">Source : Le Monde du Camping-Car</a></div>
+      <div class="fact"><div class="n">2ᵉ</div><p>marché européen des véhicules de loisirs, derrière l'Allemagne, où les prix sont souvent plus bas.</p><a href="https://fr.statista.com/infographie/32498/marche-vehicules-de-loisirs-en-europe-ventes-camping-cars-vans-par-pays/">Source : Statista</a></div>
+    </div>
+  </div>
+</section>
+
+<section id="comment" class="alt">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">Comment ça marche</span><h2>Trois étapes avant de signer</h2></div>
+    <div class="steps">
+      <div class="step"><h3>Collez l'annonce</h3><p>Lien ou texte de l'annonce, numéro d'immatriculation, ou saisie rapide : type, marque, année, kilométrage, prix.</p></div>
+      <div class="step"><h3>Lisez la cote</h3><p>Fourchette de valeur, écart avec le prix demandé, points faibles connus de la marque et de la cellule.</p></div>
+      <div class="step"><h3>Négociez</h3><p>Prix maximum conseillé et arguments chiffrés. Pour un véhicule allemand, les frais d'import sont déjà comptés.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="estimer">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Démo</span>
+      <h2>Essayez l'estimateur</h2>
+      <p>Version de démonstration : le calcul tourne dans votre navigateur avec un modèle de décote simplifié. La version complète s'appuie sur les annonces réelles du marché.</p>
+    </div>
+    <div class="demo">
+      <form class="panel form" id="est" onsubmit="return false">
+        <div class="mode seg" role="group" aria-label="Comment identifier le véhicule" id="mode">
+          <button type="button" data-v="annonce" aria-pressed="true">Par annonce</button>
+          <button type="button" data-v="plaque" aria-pressed="false">Par immatriculation</button>
+        </div>
+        <div class="paste" id="bloc-plaque" hidden>
+          <label for="plaque">Numéro d'immatriculation</label>
+          <div class="paste-row" style="align-items:center">
+            <div class="plate"><div class="eu"><small>★★★</small>F</div><input id="plaque" maxlength="9" autocomplete="off" placeholder="AB-123-CD" inputmode="text"><div class="dep" aria-hidden="true"></div></div>
+            <button class="btn" type="button" id="lire-plaque">Rechercher</button>
+          </div>
+          <p class="paste-msg" id="plaque-msg" role="status">Le véhicule est identifié à partir de sa carte grise : marque, modèle, date de 1ʳᵉ immatriculation, PTAC.</p>
+        </div>
+        <div class="paste" id="bloc-annonce">
+          <label for="annonce">Collez le lien ou le texte de l'annonce</label>
+          <div class="paste-row">
+            <textarea id="annonce" rows="2" placeholder="https://… ou « Fiat Ducato profilé 2019, 58 000 km, 38 900 € »"></textarea>
+            <button class="btn" type="button" id="lire">Analyser</button>
+          </div>
+          <p class="paste-msg" id="paste-msg" role="status">Le formulaire se remplit tout seul. Complétez ce qui manque.</p>
+        </div>
+        <label class="full" for="type">Type de véhicule
+          <select id="type">
+            <option value="" selected disabled>Choisir un type</option>
+            <option value="van">Van aménagé (type California, Marco Polo)</option>
+            <option value="fourgon">Fourgon aménagé</option>
+            <option value="profile">Profilé</option>
+            <option value="capucine">Capucine</option>
+            <option value="integral">Intégral</option>
+            <option value="pl">Poids lourd / plus de 3,5 t</option>
+            <option value="4x4">Camping-car 4x4 / expédition</option>
+          </select>
+        </label>
+        <label for="marque">Marque
+          <select id="marque"></select>
+        </label>
+        <label class="full" for="autre-marque" id="autre-wrap" hidden>Précisez la marque
+          <input id="autre-marque" type="text" autocomplete="off" placeholder="Ex. : Laika, Elnagh, Mobilvetta…">
+        </label>
+        <label for="annee">Année
+          <input id="annee" type="number" inputmode="numeric" min="1995" max="2026" placeholder="Ex. : 2019">
+        </label>
+        <label for="km">Kilométrage
+          <input id="km" type="number" inputmode="numeric" min="0" step="1000" placeholder="Ex. : 58000">
+        </label>
+        <label for="prix">Prix demandé (€)
+          <input id="prix" type="number" inputmode="numeric" min="0" step="100" placeholder="Ex. : 38900">
+        </label>
+        <div class="full" style="display:grid;gap:6px">
+          <span style="font-size:14px;font-weight:700" id="vendeur-l">Vendeur</span>
+          <div class="seg" role="group" aria-labelledby="vendeur-l" id="vendeur">
+            <button type="button" data-v="part" aria-pressed="true">Particulier</button>
+            <button type="button" data-v="pro" aria-pressed="false">Professionnel</button>
+          </div>
+        </div>
+        <div class="full" style="display:grid;gap:6px">
+          <span style="font-size:14px;font-weight:700" id="pays-l">Le véhicule est en</span>
+          <div class="seg" role="group" aria-labelledby="pays-l" id="pays">
+            <button type="button" data-v="fr" aria-pressed="true">France</button>
+            <button type="button" data-v="de" aria-pressed="false">Allemagne</button>
+          </div>
+        </div>
+      </form>
+
+      <div class="panel result" aria-live="polite">
+        <div class="empty" id="r-empty">
+          <div class="empty-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#1d5bd8"/><path d="M33.5 14.5A13 13 0 1 0 33.5 33.5" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round"/><path d="M24 24L33 18" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="24" r="3.2" fill="#fff"/></svg></div>
+          <h3>Votre estimation apparaîtra ici</h3>
+          <p id="r-manque">Renseignez le type, la marque, l'année, le kilométrage et le prix demandé.</p>
+        </div>
+        <div class="result" id="r-content" hidden>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <h3 id="r-title"></h3>
+          <span class="pill good" id="r-pill">Bonne affaire</span>
+        </div>
+        <div class="range" aria-hidden="true">
+          <div class="bar"></div>
+          <div class="mk" id="r-mk" style="left:30%"><span id="r-mk-l">Prix demandé</span></div>
+          <div class="ends"><span id="r-lo">0 €</span><span id="r-hi">0 €</span></div>
+        </div>
+        <div class="kv">
+          <div><span>Cote estimée</span><strong id="r-cote">–</strong></div>
+          <div><span>Écart</span><strong id="r-ecart">–</strong></div>
+          <div><span>Prix max conseillé</span><strong id="r-max">–</strong></div>
+        </div>
+        <div class="import" id="r-import" hidden></div>
+        <div>
+          <h3 style="font-size:16px;margin-bottom:8px">À vérifier sur ce véhicule</h3>
+          <ul class="checks" id="r-checks"></ul>
+        </div>
+        <p class="note">Estimation indicative, à titre de démonstration. Elle ne remplace pas une inspection du véhicule.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="louer" class="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Location</span>
+      <h2>Louer : comparez le prix total, pas le prix par nuit</h2>
+      <p>Frais de service, assurance, kilomètres en plus, nettoyage : deux offres au même prix par nuit peuvent finir à des centaines d'euros d'écart. Indiquez votre voyage, Cotevan calcule le vrai coût.</p>
+    </div>
+    <div class="loc">
+      <form class="panel form" id="loc" onsubmit="return false">
+        <label class="full" for="l-type">Type de véhicule
+          <select id="l-type">
+            <option value="" selected disabled>Choisir un type</option>
+            <option value="van">Van aménagé (2 à 4 places)</option>
+            <option value="fourgon">Fourgon aménagé</option>
+            <option value="profile">Profilé ou capucine</option>
+            <option value="integral">Intégral</option>
+          </select>
+        </label>
+        <label class="full" for="l-saison">Période
+          <select id="l-saison">
+            <option value="" selected disabled>Choisir une période</option>
+            <option value="basse">Basse saison (novembre à mars)</option>
+            <option value="moyenne">Moyenne saison (avril à juin, septembre, octobre)</option>
+            <option value="haute">Haute saison (juillet, août)</option>
+          </select>
+        </label>
+        <label for="l-nuits">Nombre de nuits
+          <input id="l-nuits" type="number" inputmode="numeric" min="1" max="60" placeholder="Ex. : 7">
+        </label>
+        <label for="l-km">Kilomètres prévus
+          <input id="l-km" type="number" inputmode="numeric" min="0" step="50" placeholder="Ex. : 1500">
+        </label>
+      </form>
+
+      <div class="panel" aria-live="polite">
+        <div class="empty" id="l-empty">
+          <h3>Votre comparatif apparaîtra ici</h3>
+          <p id="l-manque">Renseignez le type, la période, le nombre de nuits et les kilomètres prévus.</p>
+        </div>
+        <div class="result" id="l-content" hidden>
+          <div class="compare">
+            <div class="offer" id="o-part">
+              <span class="tag" id="t-part" hidden>Le moins cher pour ce voyage</span>
+              <h3>Entre particuliers</h3>
+              <p class="sub">Type Yescapa, Wikicampers</p>
+              <div class="total" id="tot-part">–</div>
+              <ul class="lines" id="lines-part"></ul>
+            </div>
+            <div class="offer" id="o-pro">
+              <span class="tag" id="t-pro" hidden>Le moins cher pour ce voyage</span>
+              <h3>Loueur professionnel</h3>
+              <p class="sub">Type Roadsurfer, Indie Campers, McRent</p>
+              <div class="total" id="tot-pro">–</div>
+              <ul class="lines" id="lines-pro"></ul>
+            </div>
+          </div>
+          <p class="verdict-loc" id="l-verdict"></p>
+          <p class="note">Estimation indicative à partir des fourchettes de prix moyennes publiées en France. Les prix réels varient selon la ville de départ, l'âge du véhicule et les options. Carburant, péages et campings non compris.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="platforms">
+      <div class="pf"><span class="kind">Entre particuliers</span><h3>Yescapa</h3><ul><li>Frais de service jusqu'à 15 % de la location</li><li>Kilométrage fixé par chaque propriétaire</li><li>Grand choix partout en France</li></ul><a class="more" href="https://www.yescapa.fr">Voir les offres →</a></div>
+      <div class="pf"><span class="kind">Entre particuliers</span><h3>Wikicampers</h3><ul><li>Assurance tous risques comprise</li><li>Van autour de 99 € par jour en moyenne (août 2025)</li><li>Caution annulée 8 jours après le retour sans dommage</li></ul><a class="more" href="https://www.wikicampers.fr">Voir les offres →</a></div>
+      <div class="pf"><span class="kind">Loueur pro</span><h3>Roadsurfer</h3><ul><li>Kilométrage illimité inclus</li><li>Second conducteur et matériel de camping inclus</li><li>Caution de 1 100 € en Europe</li></ul><a class="more" href="https://roadsurfer.com/fr/">Voir les offres →</a></div>
+      <div class="pf"><span class="kind">Loueur pro</span><h3>Indie Campers</h3><ul><li>9 agences en France</li><li>Kilométrage illimité selon l'agence</li><li>Protection à partir de 19,90 € par nuit</li></ul><a class="more" href="https://indiecampers.com">Voir les offres →</a></div>
+      <div class="pf"><span class="kind">Loueur pro</span><h3>McRent</h3><ul><li>Plus de 100 agences en Europe</li><li>Assurance tous risques comprise</li><li>Certains modèles dépassent 3,5 t : vérifiez votre permis</li></ul><a class="more" href="https://www.mcrent.fr">Voir les offres →</a></div>
+    </div>
+  </div>
+</section>
+
+<section id="tarifs">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Tarifs</span>
+      <h2>Des tarifs à l'échelle d'un plein, pas d'un garage</h2>
+      <p>Vous achetez un camping-car tous les cinq ou dix ans : vous payez quand vous cherchez, pas tous les mois.</p>
+    </div>
+    <div class="plans">
+      <div class="plan">
+        <h3>Aperçu</h3>
+        <div class="price">0 €</div>
+        <ul><li>Verdict : bonne affaire, prix juste ou trop cher</li><li>1 aperçu par véhicule</li><li>Sans carte bancaire</li></ul>
+        <a class="btn ghost" href="#rejoindre">Essayer</a>
+      </div>
+      <div class="plan">
+        <h3>Rapport</h3>
+        <div class="price">4,90 € <small>/ véhicule</small></div>
+        <ul><li>Cote exacte et fourchette</li><li>Prix max conseillé</li><li>Points à vérifier et arguments de négociation</li><li>Rapport PDF à garder</li></ul>
+        <a class="btn ghost" href="#rejoindre">Choisir</a>
+      </div>
+      <div class="plan hot">
+        <span class="tag">Le plus choisi</span>
+        <h3>Pass Recherche</h3>
+        <div class="price">19 € <small>/ 60 jours</small></div>
+        <ul><li>Rapports illimités pendant 60 jours</li><li>Alerte chaque matin sur les annonces sous la cote</li><li>Comparaison France / Allemagne avec frais d'import</li><li>Paiement unique, sans renouvellement</li></ul>
+        <a class="btn" href="#rejoindre">Commencer</a>
+      </div>
+      <div class="plan">
+        <h3>Rapport vendeur</h3>
+        <div class="price">9,90 € <small>/ véhicule</small></div>
+        <ul><li>Prix de vente conseillé</li><li>Annonces concurrentes près de chez vous</li><li>Conseils pour vendre plus vite</li></ul>
+        <a class="btn ghost" href="#rejoindre">Choisir</a>
+      </div>
+      <div class="plan">
+        <h3>Revendeur</h3>
+        <div class="price">29 € <small>/ mois</small></div>
+        <ul><li>Rapports illimités</li><li>10 recherches enregistrées avec alertes</li><li>Marge nette après remise en état</li><li>Export CSV, sans engagement</li></ul>
+        <a class="btn ghost" href="#rejoindre">Choisir</a>
+      </div>
+    </div>
+    <p class="math">Payer un camping-car 3 000 € trop cher, c'est le prix de plus de 150 Pass Recherche.</p>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head"><span class="eyebrow">FAQ</span><h2>Questions fréquentes</h2></div>
+    <div class="faq">
+    <details><summary>D'où vient la cote ?</summary><p>Cotevan compare le véhicule à des annonces équivalentes publiées récemment : même type d'implantation, même marque, âge et kilométrage proches. La fourchette s'élargit quand il y a peu d'annonces comparables, et le rapport l'indique.</p></details>
+    <details><summary>Est-ce que ça remplace une inspection ?</summary><p>Non. Cotevan vous dit si le prix est cohérent et quoi vérifier. L'étanchéité de la cellule, en particulier, se contrôle sur place avec un humidimètre ou par un professionnel.</p></details>
+    <details><summary>Pourquoi comparer avec l'Allemagne ?</summary><p>C'est le premier marché européen des véhicules de loisirs, avec beaucoup d'offre. Cotevan ajoute les frais d'un achat là-bas (déplacement ou convoyage, quitus fiscal, contrôle technique, carte grise française) pour savoir si l'écart vaut le voyage.</p></details>
+    <details><summary>Le comparatif de location est-il neutre ?</summary><p>Oui. Le calcul est le même pour toutes les offres et le classement dépend seulement du coût total de votre voyage. Si un lien vers une plateforme nous rapporte un jour une commission, ça n'en changera pas l'ordre, et nous l'indiquerons.</p></details>
+    <details><summary>Je suis revendeur, c'est pour moi ?</summary><p>Oui. L'offre Revendeur calcule une marge nette après frais de remise en état et vous alerte chaque matin sur les annonces sous la cote dans votre zone.</p></details>
+    <details><summary>Y a-t-il un abonnement caché ?</summary><p>Non. Le Rapport, le Pass Recherche et le Rapport vendeur se paient une seule fois, sans renouvellement. Seule l'offre Revendeur est mensuelle, sans engagement et résiliable en un clic.</p></details>
+    <details><summary>Que contient l'aperçu gratuit ?</summary><p>Le verdict sur le prix : bonne affaire, prix juste ou trop cher. La cote exacte, le prix maximum conseillé et les points à vérifier sont dans le rapport complet. Un aperçu gratuit par véhicule.</p></details>
+  </div>
+  </div>
+</section>
+
+<div class="wrap" id="rejoindre" style="padding:84px 20px 0">
+  <div class="join">
+    <div>
+      <h2>Accès anticipé</h2>
+      <p>Les premiers inscrits ont le Pass Recherche à 9,90 € au lieu de 19 €.</p>
+    </div>
+    <form id="wl" novalidate>
+      <label for="email" style="color:inherit">E-mail
+        <input id="email" type="email" autocomplete="email" placeholder="vous@exemple.fr" required>
+      </label>
+      <label for="profil" style="color:inherit">Vous êtes
+        <select id="profil">
+          <option>Je cherche un camping-car ou un van</option>
+          <option>Je revends des véhicules de loisirs</option>
+          <option>Je veux vendre le mien</option>
+        </select>
+      </label>
+      <button class="btn" type="submit">Réserver ma place</button>
+      <p class="msg" id="wl-msg" role="status"></p>
+    </form>
+  </div>
+</div>
+
+<div class="wrap">
+  <footer>
+    <a class="logo" href="#top" aria-label="Cotevan"><svg viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f6ff0"/><stop offset="1" stop-color="#1546a8"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="url(#lg2)"/><path d="M33.5 14.5A13 13 0 1 0 33.5 33.5" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round"/><path d="M24 24L33 18" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="24" r="3.2" fill="#fff"/></svg><span class="wm">cote<span>van</span></span></a>
+    <span>© 2026 Cotevan · Mentions légales · Confidentialité · CGV</span>
+    <span>Cotevan n'est affilié à aucun site d'annonces. Estimations indicatives.</span>
+  </footer>
+</div>
+
+<script>
+/* ---- Réglage : URL du service de formulaire (Tally, Formspree, Brevo…). Vide = mode démo. ---- */
+const FORM_ENDPOINT = "https://formspree.io/f/mdeergog";
+
+const $ = id => document.getElementById(id);
+const eur = n => Math.round(n).toLocaleString("fr-FR") + " €";
+const state = { vendeur: "part", pays: "fr" };
+
+/* Modèle de démonstration : prix neuf de référence par type, décote annuelle, ajustements. */
+const NEUF = { van: 72000, fourgon: 60000, profile: 72000, capucine: 64000, integral: 98000, pl: 140000, "4x4": 110000 };
+const LABEL = { van: "Van aménagé", fourgon: "Fourgon aménagé", profile: "Profilé", capucine: "Capucine", integral: "Intégral", pl: "Poids lourd", "4x4": "Camping-car 4x4" };
+/* Marques par type. k = tenue de cote (1 = moyenne du marché). */
+const MARQUES = {
+  "Volkswagen":{k:1.15,kw:["volkswagen","vw","california","grand california"],tip:"Volkswagen : contrôler la boîte DSG et l'entretien du toit relevable s'il y en a un"},
+  "Mercedes":{k:1.14,kw:["marco polo","mercedes","classe v","vito"],tip:"Mercedes : contrôler la boîte automatique et la corrosion des bas de caisse"},
+  "Ford Nugget":{k:1.05,kw:["nugget"],tip:"Ford : vérifier la courroie de distribution humide du 2.0 EcoBlue"},
+  "Westfalia":{k:1.10,kw:["westfalia"]},
+  "Pössl":{k:1.04,kw:["possl","poessl"]},
+  "Globecar":{k:1.00,kw:["globecar"]},
+  "Font Vendôme":{k:1.00,kw:["font vendome"]},
+  "Campereve":{k:0.98,kw:["campereve"]},
+  "Randger":{k:0.98,kw:["randger"]},
+  "Malibu":{k:1.03,kw:["malibu"]},
+  "Dreamer":{k:1.00,kw:["dreamer"]},
+  "Chausson":{k:1.00,kw:["chausson"]},
+  "Challenger":{k:0.98,kw:["challenger"]},
+  "Pilote":{k:1.04,kw:["pilote"]},
+  "Rapido":{k:1.05,kw:["rapido"]},
+  "Hymer":{k:1.12,kw:["hymer"]},
+  "Bürstner":{k:1.04,kw:["burstner","buerstner"]},
+  "Adria":{k:1.03,kw:["adria"]},
+  "Knaus":{k:1.03,kw:["knaus"]},
+  "Dethleffs":{k:1.03,kw:["dethleffs"]},
+  "Carado":{k:0.95,kw:["carado"]},
+  "Sun Living":{k:0.94,kw:["sun living","sunliving"]},
+  "Benimar":{k:0.95,kw:["benimar"]},
+  "Rimor":{k:0.93,kw:["rimor"]},
+  "Roller Team":{k:0.93,kw:["roller team"]},
+  "McLouis":{k:0.93,kw:["mclouis","mc louis"]},
+  "Ahorn":{k:0.92,kw:["ahorn"]},
+  "Itineo":{k:0.98,kw:["itineo"]},
+  "Frankia":{k:1.12,kw:["frankia"]},
+  "Carthago":{k:1.15,kw:["carthago"]},
+  "Niesmann+Bischoff":{k:1.14,kw:["niesmann"]},
+  "Le Voyageur":{k:1.08,kw:["le voyageur"]},
+  "Morelo":{k:1.12,kw:["morelo"]},
+  "Concorde":{k:1.12,kw:["concorde"]},
+  "Phoenix":{k:1.08,kw:["phoenix"]},
+  "Volkner":{k:1.10,kw:["volkner"]},
+  "Bimobil":{k:1.10,kw:["bimobil"]},
+  "Iveco Daily 4x4":{k:1.05,kw:["iveco","daily"],tip:"Iveco Daily 4x4 : vérifier les ponts, la boîte de transfert et les blocages de différentiel"},
+  "Mercedes Sprinter 4x4":{k:1.08,kw:["sprinter"],tip:"Sprinter 4x4 : contrôler la boîte de transfert et la corrosion du châssis"},
+  "VW Syncro":{k:1.15,kw:["syncro"],tip:"VW Syncro : véhicule de collection, faire expertiser la mécanique et la rouille"},
+  "Autre marque":{k:0.97,kw:[]}
+};
+const PAR_TYPE = {
+  van:["Volkswagen","Mercedes","Ford Nugget","Westfalia","Pössl","Campereve","Randger","Font Vendôme","Hymer","Pilote","Autre marque"],
+  fourgon:["Pössl","Globecar","Font Vendôme","Challenger","Chausson","Adria","Hymer","Malibu","Westfalia","Carado","Pilote","Dreamer","Campereve","Randger","Sun Living","Benimar","Knaus","Autre marque"],
+  profile:["Chausson","Challenger","Bürstner","Hymer","Pilote","Rapido","Benimar","Adria","Knaus","Dethleffs","Carado","Sun Living","Rimor","Roller Team","McLouis","Itineo","Frankia","Autre marque"],
+  capucine:["Chausson","Challenger","Benimar","Rimor","Roller Team","Sun Living","Ahorn","McLouis","Dethleffs","Knaus","Autre marque"],
+  integral:["Hymer","Rapido","Pilote","Bürstner","Itineo","Frankia","Carthago","Niesmann+Bischoff","Le Voyageur","Knaus","Dethleffs","Challenger","Autre marque"],
+  pl:["Morelo","Concorde","Carthago","Niesmann+Bischoff","Phoenix","Volkner","Frankia","Autre marque"],
+  "4x4":["Bimobil","Iveco Daily 4x4","Mercedes Sprinter 4x4","VW Syncro","Hymer","Autre marque"]
+};
+function remplirMarques(type, garder){
+  const sel = $("marque"), avant = garder ?? sel.value;
+  if (!PAR_TYPE[type]) { sel.innerHTML = '<option value="" selected disabled>Choisir d\'abord le type</option>'; sel.disabled = true; return; }
+  sel.disabled = false;
+  sel.innerHTML = '<option value="" disabled>Choisir une marque</option>' + PAR_TYPE[type].map(m => `<option>${m}</option>`).join("");
+  sel.value = PAR_TYPE[type].includes(avant) ? avant : "";
+}
+const YEAR_NOW = 2026;
+
+function cote(d){
+  const age = Math.max(0, YEAR_NOW - d.annee);
+  let v = NEUF[d.type] * MARQUES[d.marque].k;
+  for (let i = 0; i < age; i++) v *= (i === 0 ? 0.86 : i < 10 ? 0.94 : 0.965);
+  v = Math.max(v, NEUF[d.type] * 0.12);
+  const kmAttendu = Math.max(1, age) * 11000;
+  const ecartKm = (d.km - kmAttendu) / 10000;
+  v *= Math.min(1.10, Math.max(0.75, 1 - ecartKm * 0.018));
+  if (d.vendeur === "part") v *= 0.95;
+  return v;
+}
+
+function majAutre(){
+  const autre = $("marque").value === "Autre marque";
+  $("autre-wrap").hidden = !autre;
+}
+function analyse(){
+  majAutre();
+  const manque = [];
+  if (!$("type").value) manque.push("le type");
+  if (!$("marque").value) manque.push("la marque");
+  if (!$("annee").value) manque.push("l'année");
+  if ($("km").value === "") manque.push("le kilométrage");
+  if (!$("prix").value) manque.push("le prix demandé");
+  $("r-empty").hidden = manque.length === 0;
+  $("r-content").hidden = manque.length > 0;
+  if (manque.length) {
+    $("r-manque").textContent = "Il reste à renseigner : " + manque.join(", ") + ".";
+    return;
+  }
+  const d = {
+    type: $("type").value, marque: $("marque").value,
+    annee: Math.min(YEAR_NOW, Math.max(1990, +$("annee").value || 2019)),
+    km: Math.max(0, +$("km").value || 0), prix: Math.max(0, +$("prix").value || 0),
+    vendeur: state.vendeur, pays: state.pays
+  };
+  const vFr = cote(d);
+  const lo = vFr * 0.92, hi = vFr * 1.08;
+  const frais = d.pays === "de" ? 1400 + (d.type === "integral" ? 300 : 0) : 0;
+  const coutReel = d.prix + frais;
+  const ecart = coutReel - vFr;
+  const max = vFr * 0.97 - frais;
+
+  $("r-title").textContent = `${LABEL[d.type]} · ${d.marque === "Autre marque" && $("autre-marque").value.trim() ? $("autre-marque").value.trim() : d.marque} · ${d.annee}`;
+  $("r-cote").textContent = eur(vFr);
+  $("r-ecart").textContent = (ecart > 0 ? "+" : "−") + eur(Math.abs(ecart));
+  $("r-max").textContent = eur(Math.max(0, max));
+  $("r-lo").textContent = eur(lo * 0.9);
+  $("r-hi").textContent = eur(hi * 1.1);
+
+  const pill = $("r-pill");
+  const pct = ecart / vFr;
+  if (pct < -0.05)      { pill.className = "pill good"; pill.textContent = "Bonne affaire"; }
+  else if (pct <= 0.05) { pill.className = "pill warn"; pill.textContent = "Prix juste"; }
+  else                  { pill.className = "pill bad";  pill.textContent = "Trop cher"; }
+
+  const min = lo * 0.9, span = hi * 1.1 - min;
+  const pos = Math.min(98, Math.max(2, ((coutReel - min) / span) * 100));
+  $("r-mk").style.left = pos + "%";
+  $("r-mk-l").textContent = d.pays === "de" ? "Prix + import" : "Prix demandé";
+  $("r-mk-l").style.left = pos > 70 ? "auto" : "8px";
+  $("r-mk-l").style.right = pos > 70 ? "8px" : "auto";
+
+  const imp = $("r-import");
+  if (d.pays === "de") {
+    imp.hidden = false;
+    imp.textContent = `Achat en Allemagne : environ ${eur(frais)} de frais comptés (aller simple et retour par la route, quitus fiscal, contrôle technique, carte grise française). Le coût réel comparé à la cote française est donc ${eur(coutReel)}.`;
+  } else imp.hidden = true;
+
+  const checks = [];
+  const age = YEAR_NOW - d.annee;
+  checks.push(age >= 4
+    ? "Cellule : exiger les contrôles d'étanchéité annuels. Sans eux, la garantie constructeur tombe et le risque d'infiltration monte"
+    : "Cellule récente : vérifier que les contrôles d'étanchéité annuels ont été faits pour garder la garantie");
+  const mq = MARQUES[d.marque];
+  if (mq.tip) checks.push(mq.tip);
+  else if (mq.k >= 1.08) checks.push(`${d.marque} : marque qui tient bien sa cote. Exiger les factures d'entretien, elles font partie du prix`);
+  else if (mq.k <= 0.95 && d.marque !== "Autre marque") checks.push(`${d.marque} : gamme accessible. Vérifier les fixations du mobilier, les joints de baies et le plancher`);
+  else checks.push("Porteur (souvent Fiat Ducato) : vérifier l'embrayage et la date du dernier changement de distribution");
+  if (d.type === "capucine") checks.push("Capucine : inspecter le joint et le bois au-dessus de la cabine, zone classique d'infiltration");
+  if (d.type === "pl") checks.push("Plus de 3,5 t : permis C1 ou C obligatoire, péages et vignette plus chers, chrono-tachygraphe selon le poids");
+  if (d.type === "4x4") checks.push("4x4 : vérifier les ponts, la boîte de transfert et les traces de chocs sous le châssis");
+  if (d.type === "integral") checks.push("Intégral : l'entretien du pare-brise et des stores cabine coûte plus cher, à inclure dans la négociation");
+  if (d.type === "van" || d.type === "fourgon") checks.push("Aménagement : demander la facture et l'homologation VASP si l'aménagement n'est pas d'origine");
+  if (d.km / Math.max(1, age) < 5000 && age > 3) checks.push("Kilométrage faible : un véhicule qui roule peu s'abîme aussi. Contrôler pneus, freins et batterie cellule");
+  checks.push("Pneus : lire la date DOT, à remplacer après 6 ans même si la gomme semble bonne");
+  checks.push("PTAC à 3 500 kg ? Le permis B suffit. Au-delà, il faut le permis C1");
+  $("r-checks").innerHTML = checks.slice(0, 5).map(c => `<li>${c}</li>`).join("");
+}
+
+function seg(id, key){
+  $(id).addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    state[key] = b.dataset.v;
+    $(id).querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    analyse();
+  });
+}
+seg("vendeur", "vendeur"); seg("pays", "pays");
+["marque","autre-marque","annee","km","prix"].forEach(id => $(id).addEventListener("input", analyse));
+$("type").addEventListener("input", () => { remplirMarques($("type").value); analyse(); });
+remplirMarques("");
+analyse();
+
+/* Lecture d'une annonce collée : lien (mots du lien) ou texte libre */
+function lireAnnonce(){
+  let raw = $("annonce").value.trim(), msg = $("paste-msg");
+  if (!raw) { msg.textContent = "Collez d'abord un lien ou le texte d'une annonce."; return; }
+  let t = raw;
+  try { if (/^https?:\/\//i.test(raw)) { const u = new URL(raw); t = decodeURIComponent(u.pathname + " " + u.search).replace(/[-_/+.=&?]/g, " "); } } catch {}
+  t = t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const found = [];
+  const T = [["4x4","4x4"],["poids lourd","pl"],["integral","integral"],["capucine","capucine"],["profile","profile"],["fourgon","fourgon"],["california","van"],["marco polo","van"],["nugget","van"],["van","van"],["amenage","fourgon"]];
+  for (const [k,v] of T) if (new RegExp("\\b" + k + "\\b").test(t)) { $("type").value = v; found.push("type"); break; }
+  let marque = null;
+  for (const [m, o] of Object.entries(MARQUES)) if (o.kw.some(k => new RegExp("\\b" + k + "\\b").test(t))) { marque = m; break; }
+  if (marque && !found.includes("type")) {
+    const ty = Object.keys(PAR_TYPE).find(x => PAR_TYPE[x].includes(marque));
+    $("type").value = ty;
+  }
+  remplirMarques($("type").value);
+  if (marque && PAR_TYPE[$("type").value].includes(marque)) { $("marque").value = marque; found.push("marque"); }
+  const km = t.match(/(\d{1,3}(?:[ .\u00a0]?\d{3})+|\d{4,6})\s*km/);
+  if (km) { $("km").value = km[1].replace(/\D/g,""); found.push("kilométrage"); }
+  const prix = t.match(/(\d{1,3}(?:[ .\u00a0]?\d{3})+|\d{4,6})\s*(?:€|eur)/);
+  if (prix) { $("prix").value = prix[1].replace(/\D/g,""); found.push("prix"); }
+  const an = t.replace(/\d+\s*km/g,"").match(/\b(19[9]\d|20[0-2]\d)\b/);
+  if (an) { $("annee").value = an[1]; found.push("année"); }
+  if (/allemagne|germany|deutschland|\.de\b|mobile de/.test(t + " " + raw.toLowerCase())) { $("pays").querySelector('[data-v="de"]').click(); found.push("pays"); }
+  if (/\bpro\b|professionnel|concession|garantie/.test(t)) { $("vendeur").querySelector('[data-v="pro"]').click(); found.push("vendeur"); }
+  const missing = ["type","marque","année","kilométrage","prix"].filter(x => !found.includes(x));
+  msg.textContent = found.length
+    ? "Repéré : " + found.join(", ") + "." + (missing.length ? " À vérifier ou compléter : " + missing.join(", ") + "." : "")
+    : "Rien de reconnu dans ce lien. Collez plutôt le texte de l'annonce (titre, prix, kilométrage).";
+  analyse();
+}
+$("lire").addEventListener("click", lireAnnonce);
+
+
+/* ---- Comparatif location (modèle indicatif) ---- */
+const LOC_NUIT = { /* prix moyen par nuit, base marché */
+  van:{basse:70,moyenne:100,haute:135}, fourgon:{basse:75,moyenne:110,haute:145},
+  profile:{basse:95,moyenne:130,haute:175}, integral:{basse:125,moyenne:170,haute:230}
+};
+const LOC_LABEL = {van:"van aménagé",fourgon:"fourgon aménagé",profile:"profilé ou capucine",integral:"intégral"};
+const fmt = n => Math.round(n).toLocaleString("fr-FR") + " €";
+function comparerLocation(){
+  const t=$("l-type").value, sa=$("l-saison").value, n=+$("l-nuits").value, km=$("l-km").value===""?null:Math.max(0,+$("l-km").value);
+  const manque=[]; if(!t)manque.push("le type"); if(!sa)manque.push("la période"); if(!n||n<1)manque.push("le nombre de nuits"); if(km===null)manque.push("les kilomètres prévus");
+  $("l-empty").hidden = manque.length===0; $("l-content").hidden = manque.length>0;
+  if(manque.length){ $("l-manque").textContent="Il reste à renseigner : "+manque.join(", ")+"."; return; }
+  const base=LOC_NUIT[t][sa];
+  const remise = n>=14?0.88:n>=7?0.93:1;
+  /* Particuliers : prix plus bas, frais de service + assurance, km limités */
+  const pNuit=base*0.9*remise, pLoc=pNuit*n, pFrais=pLoc*0.15, pInclus=200*n, pKmSup=Math.max(0,km-pInclus), pKm=pKmSup*0.30, pNet=60;
+  const pTot=pLoc+pFrais+pKm+pNet;
+  /* Pros : prix plus haut, protection par nuit, km illimités, frais de préparation */
+  const rNuit=base*1.12*remise, rLoc=rNuit*n, rProt=20*n, rPrep=120;
+  const rTot=rLoc+rProt+rPrep;
+  $("tot-part").innerHTML=fmt(pTot)+"<small>soit "+fmt(pTot/n)+" par nuit tout compris</small>";
+  $("tot-pro").innerHTML=fmt(rTot)+"<small>soit "+fmt(rTot/n)+" par nuit tout compris</small>";
+  $("lines-part").innerHTML=[
+    ["Location ("+n+" nuits × "+fmt(pNuit)+")",pLoc],["Frais de service et assurance (≈ 15 %)",pFrais],
+    [pKmSup>0?("Km en plus ("+pKmSup.toLocaleString("fr-FR")+" km × 0,30 €)"):"Km inclus (≈ 200 par jour)",pKm],["Ménage ou kit literie",pNet]
+  ].map(([a,b])=>`<li><span>${a}</span><span>${fmt(b)}</span></li>`).join("")+`<li class="txt"><span>Caution bloquée</span><span>1 500 à 2 500 €</span></li>`;
+  $("lines-pro").innerHTML=[
+    ["Location ("+n+" nuits × "+fmt(rNuit)+")",rLoc],["Protection (≈ 20 € par nuit)",rProt],["Kilométrage",0],["Préparation et nettoyage",rPrep]
+  ].map(([a,b],i)=>i===2?`<li class="txt"><span>${a}</span><span>Souvent illimité</span></li>`:`<li><span>${a}</span><span>${fmt(b)}</span></li>`).join("")+`<li class="txt"><span>Caution bloquée</span><span>1 100 à 2 500 €</span></li>`;
+  const best = pTot<=rTot ? "part" : "pro";
+  $("o-part").classList.toggle("best",best==="part"); $("o-pro").classList.toggle("best",best==="pro");
+  $("t-part").hidden = best!=="part"; $("t-pro").hidden = best!=="pro";
+  const ecart=Math.abs(pTot-rTot);
+  $("l-verdict").textContent = best==="part"
+    ? `Pour ${n} nuits en ${LOC_LABEL[t]} et ${km.toLocaleString("fr-FR")} km, la location entre particuliers revient environ ${fmt(ecart)} moins cher. Vérifiez le forfait kilométrique de l'annonce avant de réserver.`
+    : `Pour ${n} nuits en ${LOC_LABEL[t]} et ${km.toLocaleString("fr-FR")} km, un loueur pro revient environ ${fmt(ecart)} moins cher, surtout grâce au kilométrage illimité.`;
+}
+["l-type","l-saison","l-nuits","l-km"].forEach(id=>$(id).addEventListener("input",comparerLocation));
+comparerLocation();
+
+/* Immatriculation. Réglage : URL d'une API de plaque (service payant). Vide = mode démo. */
+const PLAQUE_API = "";
+$("mode").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  $("mode").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  const plaque = b.dataset.v === "plaque";
+  $("bloc-plaque").hidden = !plaque; $("bloc-annonce").hidden = plaque;
+  (plaque ? $("plaque") : $("annonce")).focus();
+});
+$("plaque").addEventListener("input", e => {
+  let v = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (/^[A-Z]{2}\d/.test(v)) v = [v.slice(0,2), v.slice(2,5), v.slice(5,7)].filter(Boolean).join("-");
+  e.target.value = v;
+  $("plaque-msg").textContent = "";
+});
+async function lirePlaque(){
+  const v = $("plaque").value.trim(), msg = $("plaque-msg");
+  const siv = /^[A-HJ-NP-TV-Z]{2}-\d{3}-[A-HJ-NP-TV-Z]{2}$/.test(v);
+  const fni = /^\d{1,4}[A-Z]{1,3}\d{2,3}$/.test(v.replace(/-/g, ""));
+  if (!siv && !fni) { msg.textContent = "Ce numéro ne ressemble pas à une plaque française. Format attendu : AB-123-CD."; return; }
+  if (!PLAQUE_API) { msg.textContent = "Plaque valide. La recherche automatique par immatriculation arrive avec la version complète : en attendant, complétez le formulaire ci-dessous."; return; }
+  msg.textContent = "Recherche…";
+  try {
+    const r = await fetch(PLAQUE_API + encodeURIComponent(v.replace(/-/g, "")));
+    if (!r.ok) throw new Error();
+    const d = await r.json(); /* attendu : { marque, annee, type? } */
+    if (d.type && PAR_TYPE[d.type]) $("type").value = d.type;
+    remplirMarques($("type").value);
+    if (d.marque && PAR_TYPE[$("type").value]) { if (PAR_TYPE[$("type").value].includes(d.marque)) $("marque").value = d.marque; else { $("marque").value = "Autre marque"; $("autre-marque").value = d.marque; } }
+    if (d.annee) $("annee").value = d.annee;
+    msg.textContent = "Véhicule trouvé. Ajoutez le kilométrage et le prix demandé.";
+    analyse();
+  } catch { msg.textContent = "Recherche impossible pour le moment. Complétez le formulaire ci-dessous."; }
+}
+$("lire-plaque").addEventListener("click", lirePlaque);
+$("plaque").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); lirePlaque(); } });
+
+$("wl").addEventListener("submit", async e => {
+  e.preventDefault();
+  const email = $("email").value.trim(), msg = $("wl-msg");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.textContent = "Cette adresse e-mail n'est pas valide. Vérifiez-la et réessayez."; return; }
+  if (!FORM_ENDPOINT) { msg.textContent = "Inscriptions bientôt ouvertes : la liste d'attente n'est pas encore branchée sur cette version du site."; return; }
+  msg.textContent = "Envoi…";
+  try {
+    const r = await fetch(FORM_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify({ email, profil: $("profil").value, _subject: "Nouvelle inscription Cotevan" }) });
+    if (!r.ok) throw new Error();
+    msg.textContent = "C'est noté. Vous recevrez votre accès par e-mail.";
+    $("wl").reset();
+  } catch { msg.textContent = "L'envoi a échoué. Réessayez dans un instant."; }
+});
+</script>
+</body>
+</html>
