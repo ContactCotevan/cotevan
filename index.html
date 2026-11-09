@@ -223,6 +223,61 @@ footer .logo svg{width:26px;height:26px}
 @media (max-width:1060px){.platforms{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:860px){.loc{grid-template-columns:1fr}}
 @media (max-width:640px){.compare,.platforms{grid-template-columns:1fr}.loc .form{grid-template-columns:1fr}}
+
+
+.rhead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.h4{font-size:16px;margin-bottom:8px}
+.lockwrap{position:relative}
+.lockbody{display:grid;gap:16px}
+.lockwrap.locked{min-height:300px}
+.lockwrap.locked > .lockbody{filter:blur(6px);pointer-events:none;user-select:none;opacity:.65}
+.gate{display:none}
+.lockwrap.locked > .gate{display:grid;gap:10px;position:absolute;inset:0;margin:auto;width:min(370px,92%);height:max-content;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 24px 50px -20px rgba(17,52,120,.45);text-align:center;z-index:2}
+.gate p{font-size:14px;color:var(--muted)}
+.gate-tag{justify-self:center;background:var(--blue-soft);color:var(--blue);font:700 12px var(--body);padding:4px 10px;border-radius:999px}
+.gate-msg:empty,.auth-msg:empty{display:none}
+.gate-msg{font-size:13px;color:var(--ink)}
+.more-note{font-size:13px;color:var(--blue);font-weight:600;margin-top:8px}
+.more-note:empty{display:none}
+.nego{border-top:1px solid var(--line);padding-top:16px}
+.kv2{grid-template-columns:1fr 1fr}
+.msgs{display:grid;gap:10px}
+.msg-card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff}
+.msg-card header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
+.msg-card strong{font-size:14px}
+.msg-card p{font-size:14px;color:var(--ink);white-space:pre-line}
+.copy{border:1px solid var(--line);background:var(--tint);color:var(--blue);font:700 12px var(--body);padding:5px 10px;border-radius:8px;cursor:pointer}
+.copy:hover{background:var(--blue-soft)}
+.note.saved{color:var(--good);font-weight:600}
+.note.saved:empty{display:none}
+#lancer{margin-top:4px}
+#lancer:disabled{background:#c7d3ea;border-color:#c7d3ea;box-shadow:none;cursor:not-allowed;transform:none}
+/* espace */
+.espace-head{max-width:none}
+.esp-actions{display:flex;gap:10px;flex-wrap:wrap}
+.reports{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.report{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:10px}
+.report h3{font-size:17px}
+.report .meta{font-size:13px;color:var(--muted)}
+.report .nums{display:flex;gap:16px;font-size:14px}
+.report .nums b{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.report .acts{display:flex;gap:8px}
+.report .acts button{flex:1}
+.reports .empty{grid-column:1/-1}
+/* modal */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(11,31,58,.45);display:grid;place-items:center;padding:16px}
+.modal-card{position:relative;background:#fff;border-radius:20px;padding:28px;width:min(420px,100%);display:grid;gap:14px;box-shadow:0 30px 80px -20px rgba(11,31,58,.5);max-height:calc(100% - 16px);overflow:auto}
+.modal-card h2{font-size:24px}
+.modal-x{position:absolute;top:12px;right:14px;border:0;background:none;font-size:26px;line-height:1;color:var(--muted);cursor:pointer}
+.btn.google{background:#fff;color:var(--ink);border-color:var(--line);box-shadow:none}
+.btn.google:hover{background:var(--tint)}
+.or{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+#auth-form{display:grid;gap:12px}
+.auth-msg{font-size:14px;color:var(--ink);background:var(--tint);border-radius:10px;padding:10px 12px}
+.auth-msg.err{background:color-mix(in srgb,var(--bad) 10%, #fff);color:var(--bad)}
+.auth-fine{font-size:12px;color:var(--muted);text-align:center}
+@media (max-width:640px){.hide-m{display:none}}
 </style>
 </head>
 <body>
@@ -234,7 +289,8 @@ footer .logo svg{width:26px;height:26px}
       <a href="#louer">Louer</a>
       <a href="#tarifs">Tarifs</a>
       <a href="#faq">FAQ</a>
-      <a class="btn small" href="#rejoindre">Accès anticipé</a>
+      <a class="btn small ghost hide-m" href="#rejoindre">Accès anticipé</a>
+      <button class="btn small" type="button" id="nav-compte">Se connecter</button>
     </div>
   </nav>
 </div></div>
@@ -249,7 +305,7 @@ footer .logo svg{width:26px;height:26px}
         <a class="btn" href="#estimer">Estimer un achat</a>
         <a class="btn ghost" href="#louer">Comparer une location</a>
       </div>
-      <ul class="trust"><li>Aperçu gratuit</li><li>Sans carte bancaire</li><li>Sans abonnement</li></ul>
+      <ul class="trust"><li>Compte gratuit</li><li>Sans carte bancaire</li><li>Sans abonnement</li></ul>
     </div>
 
     <article class="cg" aria-label="Exemple de rapport Cotevan">
@@ -372,6 +428,7 @@ footer .logo svg{width:26px;height:26px}
             <button type="button" data-v="de" aria-pressed="false">Allemagne</button>
           </div>
         </div>
+        <button class="btn full" type="button" id="lancer" disabled>Lancer l'analyse</button>
       </form>
 
       <div class="panel result" aria-live="polite">
@@ -381,25 +438,60 @@ footer .logo svg{width:26px;height:26px}
           <p id="r-manque">Renseignez le type, la marque, l'année, le kilométrage et le prix demandé.</p>
         </div>
         <div class="result" id="r-content" hidden>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div class="rhead">
           <h3 id="r-title"></h3>
           <span class="pill good" id="r-pill">Bonne affaire</span>
         </div>
-        <div class="range" aria-hidden="true">
-          <div class="bar"></div>
-          <div class="mk" id="r-mk" style="left:30%"><span id="r-mk-l">Prix demandé</span></div>
-          <div class="ends"><span id="r-lo">0 €</span><span id="r-hi">0 €</span></div>
+        <div class="lockwrap" id="lock1">
+          <div class="lockbody">
+            <div class="range" aria-hidden="true">
+              <div class="bar"></div>
+              <div class="mk" id="r-mk" style="left:50%"><span id="r-mk-l">Prix demandé</span></div>
+              <div class="ends"><span id="r-lo">0 €</span><span id="r-hi">0 €</span></div>
+            </div>
+            <div class="kv">
+              <div><span>Cote estimée</span><strong id="r-cote">–</strong></div>
+              <div><span>Écart</span><strong id="r-ecart">–</strong></div>
+              <div><span>Prix max conseillé</span><strong id="r-max">–</strong></div>
+            </div>
+            <div class="import" id="r-import" hidden></div>
+            <div>
+              <h3 class="h4">À vérifier sur ce véhicule</h3>
+              <ul class="checks" id="r-checks"></ul>
+              <p class="more-note" id="r-more"></p>
+            </div>
+            <div class="lockwrap" id="lock2">
+              <div class="lockbody nego">
+                <h3 class="h4">Votre stratégie de négociation</h3>
+                <div class="kv kv2">
+                  <div><span>Offre d'ouverture</span><strong id="n-open">–</strong></div>
+                  <div><span>À ne pas dépasser</span><strong id="n-max">–</strong></div>
+                </div>
+                <h3 class="h4">Vos arguments</h3>
+                <ul class="checks args" id="n-args"></ul>
+                <h3 class="h4">Messages prêts à envoyer au vendeur</h3>
+                <div class="msgs" id="n-msgs"></div>
+                <h3 class="h4">Questions à poser au vendeur</h3>
+                <ul class="checks" id="n-q"></ul>
+              </div>
+              <div class="gate">
+                <span class="gate-tag">Rapport complet</span>
+                <h3>Négociez avec des arguments</h3>
+                <p>Prix maximum, tous les points à vérifier, votre offre d'ouverture et 3 messages prêts à envoyer au vendeur.</p>
+                <button class="btn" type="button" data-pay="rapport">Débloquer ce rapport · 4,90 €</button>
+                <button class="btn ghost" type="button" data-pay="pass">Pass Recherche · 19 € pour 60 jours</button>
+                <p class="gate-msg" id="pay-msg" role="status"></p>
+              </div>
+            </div>
+          </div>
+          <div class="gate">
+            <h3>Votre cote est prête</h3>
+            <p>Créez votre compte gratuit pour voir la cote, l'écart de prix et retrouver vos rapports dans votre espace.</p>
+            <button class="btn" type="button" data-auth="signup">Créer un compte gratuit</button>
+            <button class="btn ghost" type="button" data-auth="login">J'ai déjà un compte</button>
+          </div>
         </div>
-        <div class="kv">
-          <div><span>Cote estimée</span><strong id="r-cote">–</strong></div>
-          <div><span>Écart</span><strong id="r-ecart">–</strong></div>
-          <div><span>Prix max conseillé</span><strong id="r-max">–</strong></div>
-        </div>
-        <div class="import" id="r-import" hidden></div>
-        <div>
-          <h3 style="font-size:16px;margin-bottom:8px">À vérifier sur ce véhicule</h3>
-          <ul class="checks" id="r-checks"></ul>
-        </div>
+        <p class="note saved" id="r-saved"></p>
         <p class="note">Estimation indicative, à titre de démonstration. Elle ne remplace pas une inspection du véhicule.</p>
         </div>
       </div>
@@ -408,6 +500,18 @@ footer .logo svg{width:26px;height:26px}
 </section>
 
 
+
+<section id="mon-espace" hidden>
+  <div class="wrap">
+    <div class="sec-head espace-head">
+      <span class="eyebrow">Mon espace</span>
+      <h2>Mes rapports</h2>
+      <p id="esp-who"></p>
+      <div class="esp-actions"><a class="btn small" href="#estimer">Nouvelle analyse</a><button class="btn small ghost" type="button" id="logout">Se déconnecter</button></div>
+    </div>
+    <div class="reports" id="reports"></div>
+  </div>
+</section>
 <section id="louer" class="alt">
   <div class="wrap">
     <div class="sec-head">
@@ -489,22 +593,22 @@ footer .logo svg{width:26px;height:26px}
     </div>
     <div class="plans">
       <div class="plan">
-        <h3>Aperçu</h3>
+        <h3>Compte gratuit</h3>
         <div class="price">0 €</div>
-        <ul><li>Verdict : bonne affaire, prix juste ou trop cher</li><li>1 aperçu par véhicule</li><li>Sans carte bancaire</li></ul>
-        <a class="btn ghost" href="#rejoindre">Essayer</a>
+        <ul><li>Verdict : bonne affaire, prix juste ou trop cher</li><li>Cote estimée et écart avec le prix</li><li>Vos rapports gardés dans votre espace</li><li>Sans carte bancaire</li></ul>
+        <button class="btn ghost" type="button" data-auth="signup">Créer un compte</button>
       </div>
       <div class="plan">
         <h3>Rapport</h3>
         <div class="price">4,90 € <small>/ véhicule</small></div>
-        <ul><li>Cote exacte et fourchette</li><li>Prix max conseillé</li><li>Points à vérifier et arguments de négociation</li><li>Rapport PDF à garder</li></ul>
+        <ul><li>Prix maximum conseillé</li><li>Tous les points à vérifier</li><li>Offre d'ouverture et arguments chiffrés</li><li>3 messages prêts à envoyer au vendeur</li></ul>
         <a class="btn ghost" href="#rejoindre">Choisir</a>
       </div>
       <div class="plan hot">
         <span class="tag">Le plus choisi</span>
         <h3>Pass Recherche</h3>
         <div class="price">19 € <small>/ 60 jours</small></div>
-        <ul><li>Rapports illimités pendant 60 jours</li><li>Alerte chaque matin sur les annonces sous la cote</li><li>Comparaison France / Allemagne avec frais d'import</li><li>Paiement unique, sans renouvellement</li></ul>
+        <ul><li>Rapports complets illimités pendant 60 jours</li><li>Alerte chaque matin sur les annonces sous la cote</li><li>Comparaison France / Allemagne avec frais d'import</li><li>Paiement unique, sans renouvellement</li></ul>
         <a class="btn" href="#rejoindre">Commencer</a>
       </div>
       <div class="plan">
@@ -570,6 +674,28 @@ footer .logo svg{width:26px;height:26px}
   </footer>
 </div>
 
+
+<div class="modal" id="auth" hidden role="dialog" aria-modal="true" aria-labelledby="auth-title">
+  <div class="modal-card">
+    <button class="modal-x" type="button" id="auth-close" aria-label="Fermer">×</button>
+    <h2 id="auth-title">Créer un compte gratuit</h2>
+    <div class="seg" role="group" aria-label="Choisir" id="auth-mode">
+      <button type="button" data-v="signup" aria-pressed="true">Créer un compte</button>
+      <button type="button" data-v="login" aria-pressed="false">Se connecter</button>
+    </div>
+    <button class="btn google" type="button" id="auth-google"><svg viewBox="0 0 48 48" width="18" height="18" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>Continuer avec Google</button>
+    <div class="or"><span>ou avec votre e-mail</span></div>
+    <form id="auth-form" novalidate>
+      <label for="auth-email">E-mail<input id="auth-email" type="email" autocomplete="email" placeholder="vous@exemple.fr"></label>
+      <label for="auth-pw">Mot de passe<input id="auth-pw" type="password" autocomplete="new-password" placeholder="8 caractères minimum"></label>
+      <button class="btn" type="submit" id="auth-submit">Créer mon compte</button>
+      <p class="auth-msg" id="auth-msg" role="status"></p>
+    </form>
+    <p class="auth-fine" id="auth-fine">Gratuit, sans carte bancaire. Vos rapports sont enregistrés dans votre espace.</p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
 /* ---- Réglage : URL du service de formulaire (Tally, Formspree, Brevo…). Vide = mode démo. ---- */
 const FORM_ENDPOINT = "https://formspree.io/f/mdeergog";
@@ -659,20 +785,31 @@ function majAutre(){
   const autre = $("marque").value === "Autre marque";
   $("autre-wrap").hidden = !autre;
 }
+function manquants(){
+  const m = [];
+  if (!$("type").value) m.push("le type");
+  if (!$("marque").value) m.push("la marque");
+  if (!$("annee").value) m.push("l'année");
+  if ($("km").value === "") m.push("le kilométrage");
+  if (!$("prix").value) m.push("le prix demandé");
+  return m;
+}
+/* Appelé à chaque modification : on n'affiche jamais de résultat sans clic sur « Lancer l'analyse » */
+function majEtat(){
+  majAutre();
+  const m = manquants();
+  $("lancer").disabled = m.length > 0;
+  $("r-empty").hidden = false;
+  $("r-content").hidden = true;
+  $("r-manque").textContent = m.length
+    ? "Il reste à renseigner : " + m.join(", ") + "."
+    : "Tout est prêt. Cliquez sur « Lancer l'analyse ».";
+}
 function analyse(){
   majAutre();
-  const manque = [];
-  if (!$("type").value) manque.push("le type");
-  if (!$("marque").value) manque.push("la marque");
-  if (!$("annee").value) manque.push("l'année");
-  if ($("km").value === "") manque.push("le kilométrage");
-  if (!$("prix").value) manque.push("le prix demandé");
-  $("r-empty").hidden = manque.length === 0;
-  $("r-content").hidden = manque.length > 0;
-  if (manque.length) {
-    $("r-manque").textContent = "Il reste à renseigner : " + manque.join(", ") + ".";
-    return;
-  }
+  if (manquants().length) { majEtat(); return; }
+  $("r-empty").hidden = true;
+  $("r-content").hidden = false;
   const d = {
     type: $("type").value, marque: $("marque").value,
     annee: Math.min(YEAR_NOW, Math.max(1990, +$("annee").value || 2019)),
@@ -730,22 +867,306 @@ function analyse(){
   if (d.km / Math.max(1, age) < 5000 && age > 3) checks.push("Kilométrage faible : un véhicule qui roule peu s'abîme aussi. Contrôler pneus, freins et batterie cellule");
   checks.push("Pneus : lire la date DOT, à remplacer après 6 ans même si la gomme semble bonne");
   checks.push("PTAC à 3 500 kg ? Le permis B suffit. Au-delà, il faut le permis C1");
-  $("r-checks").innerHTML = checks.slice(0, 5).map(c => `<li>${c}</li>`).join("");
+  rendre(d, { vFr, lo, hi, frais, coutReel, ecart, max, pos, checks });
 }
+
+/* =====================================================================
+   COMPTES CLIENTS
+   Réglages : collez ici l'URL et la clé "anon public" de votre projet Supabase.
+   Tant qu'elles sont vides, le site tourne en MODE DÉMO : les comptes et
+   rapports sont simulés dans le navigateur, sur cet appareil uniquement.
+   ===================================================================== */
+const SUPABASE_URL = "https://hduwpblhotzonxxiuxoh.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_v-wS7qE5eglBG9J0iIYiSA_ecXkSWJv";
+/* Liens de paiement Stripe (Payment Links). Vides = paiement pas encore ouvert. */
+const PAIEMENT_RAPPORT = "";
+const PAIEMENT_PASS = "";
+
+const DEMO = !(SUPABASE_URL && SUPABASE_ANON_KEY);
+const sb = (!DEMO && window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+/* Clés renseignées mais bibliothèque non chargée (réseau) : on ne bascule jamais en démo */
+const INDISPO = !DEMO && !sb;
+const errIndispo = () => new Error("Le service de comptes ne répond pas. Vérifiez votre connexion et rechargez la page.");
+let user = null;   /* { id, email, premium } */
+
+const store = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+};
+const Compte = {
+  async init(){
+    if (INDISPO) { user = null; return; }
+    if (DEMO) { const e = store.get("cv_demo_session", null); user = e ? { id: e, email: e, premium: false } : null; return; }
+    const { data } = await sb.auth.getSession();
+    user = mapUser(data.session?.user);
+    sb.auth.onAuthStateChange((_evt, session) => { user = mapUser(session?.user); apresAuth(); });
+  },
+  async signUp(email, pw){
+    if (INDISPO) throw errIndispo();
+    if (DEMO) {
+      const u = store.get("cv_demo_users", {});
+      if (u[email]) throw new Error("Un compte existe déjà avec cet e-mail. Connectez-vous.");
+      u[email] = pw; store.set("cv_demo_users", u); store.set("cv_demo_session", email);
+      user = { id: email, email, premium: false }; return { connecte: true };
+    }
+    const { data, error } = await sb.auth.signUp({ email, password: pw, options: { emailRedirectTo: location.origin + location.pathname } });
+    if (error) throw new Error(traduire(error.message));
+    if (data.session) { user = mapUser(data.user); return { connecte: true }; }
+    return { connecte: false };
+  },
+  async signIn(email, pw){
+    if (INDISPO) throw errIndispo();
+    if (DEMO) {
+      const u = store.get("cv_demo_users", {});
+      if (u[email] !== pw) throw new Error("E-mail ou mot de passe incorrect.");
+      store.set("cv_demo_session", email); user = { id: email, email, premium: false }; return;
+    }
+    const { data, error } = await sb.auth.signInWithPassword({ email, password: pw });
+    if (error) throw new Error(traduire(error.message));
+    user = mapUser(data.user);
+  },
+  async google(){
+    if (INDISPO) throw errIndispo();
+    if (DEMO) throw new Error("La connexion Google sera active dès que le site sera relié à Supabase. En attendant, utilisez votre e-mail.");
+    const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname + "#estimer" } });
+    if (error) throw new Error(traduire(error.message));
+  },
+  async signOut(){
+    if (INDISPO) { user = null; return; }
+    if (DEMO) { store.set("cv_demo_session", null); user = null; return; }
+    await sb.auth.signOut(); user = null;
+  },
+  async lister(){
+    if (!user) return [];
+    if (INDISPO) throw errIndispo();
+    if (DEMO) return store.get("cv_demo_rapports_" + user.id, []);
+    const { data, error } = await sb.from("rapports").select("id, created_at, vehicule, donnees").order("created_at", { ascending: false });
+    if (error) throw new Error("Impossible de charger vos rapports pour le moment.");
+    return data;
+  },
+  async enregistrer(vehicule, donnees){
+    if (INDISPO) throw errIndispo();
+    if (!user) return;
+    if (DEMO) {
+      const k = "cv_demo_rapports_" + user.id, l = store.get(k, []);
+      l.unshift({ id: String(Date.now()), created_at: new Date().toISOString(), vehicule, donnees }); store.set(k, l.slice(0, 50)); return;
+    }
+    const { error } = await sb.from("rapports").insert({ vehicule, donnees });
+    if (error) throw new Error("Le rapport n'a pas pu être enregistré.");
+  },
+  async supprimer(id){
+    if (INDISPO) throw errIndispo();
+    if (DEMO) { const k = "cv_demo_rapports_" + user.id; store.set(k, store.get(k, []).filter(r => r.id !== id)); return; }
+    const { error } = await sb.from("rapports").delete().eq("id", id);
+    if (error) throw new Error("La suppression a échoué.");
+  }
+};
+function mapUser(u){ return u ? { id: u.id, email: u.email, premium: !!(u.app_metadata && u.app_metadata.premium) } : null; }
+function traduire(m){
+  if (/Invalid login/i.test(m)) return "E-mail ou mot de passe incorrect.";
+  if (/already registered|already been registered/i.test(m)) return "Un compte existe déjà avec cet e-mail. Connectez-vous.";
+  if (/Email not confirmed/i.test(m)) return "Confirmez d'abord votre adresse avec le lien reçu par e-mail.";
+  if (/at least/i.test(m)) return "Le mot de passe doit contenir au moins 8 caractères.";
+  return "Une erreur est survenue. Réessayez dans un instant.";
+}
+const niveau = () => !user ? 0 : (user.premium ? 2 : 1);
+
+/* ---------- Fenêtre de connexion ---------- */
+let authMode = "signup";
+function ouvrirAuth(mode){
+  authMode = mode || "signup";
+  $("auth").hidden = false;
+  $("auth-msg").textContent = ""; $("auth-msg").className = "auth-msg";
+  majAuth();
+  setTimeout(() => $("auth-email").focus(), 30);
+}
+function fermerAuth(){ $("auth").hidden = true; }
+function majAuth(){
+  const su = authMode === "signup";
+  $("auth-title").textContent = su ? "Créer un compte gratuit" : "Se connecter";
+  $("auth-submit").textContent = su ? "Créer mon compte" : "Me connecter";
+  $("auth-pw").autocomplete = su ? "new-password" : "current-password";
+  $("auth-mode").querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === authMode));
+  $("auth-fine").textContent = DEMO
+    ? "Mode démonstration : le compte est simulé sur cet appareil, en attendant le branchement des vrais comptes."
+    : "Gratuit, sans carte bancaire. Vos rapports sont enregistrés dans votre espace.";
+}
+function authMsg(t, err){ const m = $("auth-msg"); m.textContent = t; m.className = "auth-msg" + (err ? " err" : ""); }
+$("auth-mode").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { authMode = b.dataset.v; majAuth(); authMsg(""); } });
+$("auth-close").addEventListener("click", fermerAuth);
+$("auth").addEventListener("click", e => { if (e.target === $("auth")) fermerAuth(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("auth").hidden) fermerAuth(); });
+$("auth-google").addEventListener("click", async () => { try { await Compte.google(); } catch (err) { authMsg(err.message, true); } });
+$("auth-form").addEventListener("submit", async e => {
+  e.preventDefault();
+  const email = $("auth-email").value.trim().toLowerCase(), pw = $("auth-pw").value;
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return authMsg("Cette adresse e-mail n'est pas valide.", true);
+  if (pw.length < 8) return authMsg("Le mot de passe doit contenir au moins 8 caractères.", true);
+  $("auth-submit").disabled = true;
+  try {
+    if (authMode === "signup") {
+      const r = await Compte.signUp(email, pw);
+      if (!r.connecte) { authMsg("Compte créé. Cliquez sur le lien envoyé à " + email + " pour l'activer, puis connectez-vous."); return; }
+    } else await Compte.signIn(email, pw);
+    fermerAuth(); $("auth-pw").value = "";
+    await apresAuth();
+  } catch (err) { authMsg(err.message, true); }
+  finally { $("auth-submit").disabled = false; }
+});
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-auth]"); if (a) ouvrirAuth(a.dataset.auth);
+  const pay = e.target.closest("[data-pay]");
+  if (pay) {
+    const lien = pay.dataset.pay === "pass" ? PAIEMENT_PASS : PAIEMENT_RAPPORT;
+    if (lien) location.href = lien + (user ? "?prefilled_email=" + encodeURIComponent(user.email) : "");
+    else $("pay-msg").textContent = "Le paiement ouvre très bientôt. Vous serez prévenu par e-mail.";
+  }
+});
+$("nav-compte").addEventListener("click", () => {
+  if (user) $("mon-espace").scrollIntoView({ behavior: "smooth" }); else ouvrirAuth("login");
+});
+$("logout").addEventListener("click", async () => { await Compte.signOut(); await apresAuth(); });
+
+/* Après connexion / déconnexion : mettre à jour l'en-tête, l'espace et le rapport affiché */
+let dernierRapport = null, dernierEnregistre = "";
+async function apresAuth(){
+  $("nav-compte").textContent = user ? "Mon espace" : "Se connecter";
+  $("mon-espace").hidden = !user;
+  if (user) {
+    $("esp-who").textContent = "Connecté avec " + user.email + (user.premium ? " · accès complet" : " · compte gratuit");
+    await afficherRapports();
+  }
+  if (dernierRapport && !$("r-content").hidden) { rendre(dernierRapport.d, dernierRapport.r); await sauver(); }
+}
+
+/* ---------- Affichage du rapport selon le niveau ---------- */
+const MASQUE = "•• ••• €";
+const arrondi = n => Math.round(n / 100) * 100;
+function rendre(d, r){
+  dernierRapport = { d, r };
+  const lvl = niveau();
+  $("lock1").classList.toggle("locked", lvl === 0);
+  $("lock2").classList.toggle("locked", lvl === 1);
+  $("r-saved").textContent = "";
+  const titre = $("r-title").textContent;
+
+  /* niveau 1 et plus : cote, écart, curseur */
+  if (lvl >= 1) {
+    $("r-cote").textContent = eur(r.vFr);
+    $("r-ecart").textContent = (r.ecart > 0 ? "+" : "−") + eur(Math.abs(r.ecart));
+    $("r-lo").textContent = eur(r.lo * 0.9); $("r-hi").textContent = eur(r.hi * 1.1);
+    $("r-mk").style.left = r.pos + "%";
+  } else {
+    ["r-cote","r-ecart","r-lo","r-hi"].forEach(id => $(id).textContent = MASQUE);
+    $("r-mk").style.left = "50%";
+  }
+  /* niveau 2 : prix max, import, tous les points, négociation */
+  $("r-max").textContent = lvl >= 2 ? eur(Math.max(0, r.max)) : "🔒 Rapport complet";
+  if (lvl < 2) $("r-import").hidden = true;
+  const visibles = lvl >= 2 ? r.checks.slice(0, 6) : lvl === 1 ? r.checks.slice(0, 1) : [];
+  const caches = lvl >= 2 ? 0 : Math.max(0, Math.min(6, r.checks.length) - visibles.length);
+  $("r-checks").innerHTML = visibles.map(c => `<li>${c}</li>`).join("") + (lvl === 0 ? "<li>Point à vérifier sur ce modèle</li><li>Point à vérifier sur ce modèle</li>" : "");
+  $("r-more").textContent = lvl === 1 && caches ? `+ ${caches} autres points à vérifier dans le rapport complet` : "";
+
+  if (lvl >= 2) {
+    const cible = Math.min(d.prix, Math.max(0, r.max));
+    const plafond = arrondi(cible);
+    const ouverture = arrondi(Math.max(r.vFr * 0.85, cible * 0.92));
+    const derniere = arrondi((ouverture + plafond) / 2);
+    $("n-open").textContent = eur(ouverture); $("n-max").textContent = eur(plafond);
+    const age = YEAR_NOW - d.annee, kmAtt = Math.max(1, age) * 11000;
+    const args = [];
+    if (r.ecart > 0) args.push(`Le prix demandé dépasse d'environ ${eur(r.ecart)} la cote des annonces comparables.`);
+    else args.push(`Le prix est déjà sous la cote d'environ ${eur(-r.ecart)} : négociez surtout les extras et les frais.`);
+    if (d.km > kmAtt * 1.15) args.push(`Kilométrage au-dessus de la moyenne : ${d.km.toLocaleString("fr-FR")} km pour environ ${kmAtt.toLocaleString("fr-FR")} km attendus à cet âge.`);
+    if (age >= 8) args.push(`À ${age} ans, joints de cellule, batteries et pneus sont à surveiller : chaque frais à prévoir se déduit de votre offre.`);
+    if (d.pays === "de") args.push(`Achat en Allemagne : environ ${eur(r.frais)} de frais à votre charge, à déduire du prix.`);
+    args.push(d.vendeur === "part"
+      ? "Entre particuliers, vous n'avez pas la garantie d'un professionnel : ce risque justifie une remise."
+      : "Chez un professionnel, négociez aussi les extras : garantie prolongée, révision, pneus neufs, contrôle d'étanchéité.");
+    args.push("Pas de contrôle d'étanchéité récent avec facture ? Demandez-le avant l'achat, ou déduisez son coût.");
+    $("n-args").innerHTML = args.map(a => `<li>${a}</li>`).join("");
+    const msgs = [
+      ["Premier contact", `Bonjour,\nVotre ${titre} m'intéresse. Avant de me déplacer, pourriez-vous me confirmer le kilométrage exact, la date du dernier contrôle d'étanchéité de la cellule (avec la facture), l'historique d'entretien et la date des pneus ?\nJe suis un acheteur sérieux et disponible rapidement.\nMerci,\n[Prénom]`],
+      ["Proposition après la visite", `Bonjour,\nMerci pour la visite. Au vu des annonces comparables et des frais à prévoir, je peux vous proposer ${eur(ouverture)}, réglés rapidement par virement.\nCette offre vous conviendrait-elle ?\n[Prénom]`],
+      ["Dernière offre", `Bonjour,\nJ'ai bien réfléchi à votre ${titre}. Ma dernière proposition est de ${eur(derniere)} : c'est le maximum que je peux mettre au regard du marché.\nSi cela vous convient, je peux venir le chercher cette semaine.\n[Prénom]`]
+    ];
+    $("n-msgs").innerHTML = msgs.map(([t, m], i) => `<div class="msg-card"><header><strong>${t}</strong><button class="copy" type="button" data-copy="${i}">Copier</button></header><p id="msg-${i}">${m}</p></div>`).join("");
+    $("n-q").innerHTML = ["Avez-vous les factures d'entretien du porteur et de la cellule ?","Quelle est la date du dernier contrôle d'étanchéité, et le taux d'humidité relevé ?","Le véhicule a-t-il eu un sinistre ou une infiltration d'eau ?","Combien de propriétaires, et le contrôle technique est-il à jour ?","Quelle est la date des pneus (code DOT) ?"].map(q => `<li>${q}</li>`).join("");
+  } else {
+    $("n-open").textContent = MASQUE; $("n-max").textContent = MASQUE;
+    $("n-args").innerHTML = "<li>Argument de négociation chiffré</li><li>Argument de négociation chiffré</li><li>Argument de négociation chiffré</li>";
+    $("n-msgs").innerHTML = '<div class="msg-card"><header><strong>Message au vendeur</strong></header><p>Bonjour, votre véhicule m\'intéresse, je peux vous proposer un prix…</p></div>'.repeat(2);
+    $("n-q").innerHTML = "<li>Question à poser au vendeur</li><li>Question à poser au vendeur</li>";
+  }
+}
+document.addEventListener("click", async e => {
+  const b = e.target.closest("[data-copy]"); if (!b) return;
+  const txt = $("msg-" + b.dataset.copy).textContent;
+  try { await navigator.clipboard.writeText(txt); b.textContent = "Copié"; }
+  catch { const r = document.createRange(); r.selectNodeContents($("msg-" + b.dataset.copy)); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); b.textContent = "Sélectionné"; }
+  setTimeout(() => b.textContent = "Copier", 1800);
+});
+
+/* ---------- Enregistrement et espace client ---------- */
+function entrees(){
+  return { type: $("type").value, marque: $("marque").value, autre: $("autre-marque").value.trim(), annee: +$("annee").value, km: +$("km").value, prix: +$("prix").value, vendeur: state.vendeur, pays: state.pays };
+}
+async function sauver(){
+  if (!user || !dernierRapport) return;
+  const e = entrees(), cle = JSON.stringify(e);
+  if (cle === dernierEnregistre) { $("r-saved").textContent = "✓ Rapport enregistré dans votre espace"; return; }
+  try {
+    await Compte.enregistrer($("r-title").textContent, { ...e, cote: Math.round(dernierRapport.r.vFr), verdict: $("r-pill").textContent });
+    dernierEnregistre = cle;
+    $("r-saved").textContent = "✓ Rapport enregistré dans votre espace";
+    afficherRapports();
+  } catch (err) { $("r-saved").textContent = err.message; }
+}
+async function afficherRapports(){
+  const box = $("reports");
+  let liste = [];
+  try { liste = await Compte.lister(); } catch (err) { box.innerHTML = `<div class="empty"><p>${err.message}</p></div>`; return; }
+  if (!liste.length) { box.innerHTML = '<div class="empty"><h3>Aucun rapport pour l\'instant</h3><p>Lancez une analyse : elle sera enregistrée ici automatiquement.</p></div>'; return; }
+  box.innerHTML = liste.map(r => {
+    const d = r.donnees || {}, date = new Date(r.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+    const cls = /affaire/i.test(d.verdict) ? "good" : /juste/i.test(d.verdict) ? "warn" : "bad";
+    return `<article class="report"><span class="pill ${cls}" style="justify-self:start">${d.verdict || ""}</span><h3>${r.vehicule}</h3><p class="meta">${date} · ${(d.km || 0).toLocaleString("fr-FR")} km</p><div class="nums"><span>Prix <b>${eur(d.prix || 0)}</b></span><span>Cote <b>${eur(d.cote || 0)}</b></span></div><div class="acts"><button class="btn small" type="button" data-ouvrir="${r.id}">Ouvrir</button><button class="btn small ghost" type="button" data-suppr="${r.id}">Supprimer</button></div></article>`;
+  }).join("");
+  box.querySelectorAll("[data-ouvrir]").forEach(b => b.addEventListener("click", () => ouvrirRapport(liste.find(x => x.id == b.dataset.ouvrir))));
+  box.querySelectorAll("[data-suppr]").forEach(b => b.addEventListener("click", async () => { try { await Compte.supprimer(b.dataset.suppr); afficherRapports(); } catch (err) { b.textContent = "Échec"; } }));
+}
+function ouvrirRapport(r){
+  const d = r.donnees || {};
+  $("type").value = d.type; remplirMarques(d.type, d.marque);
+  $("autre-marque").value = d.autre || ""; $("annee").value = d.annee; $("km").value = d.km; $("prix").value = d.prix;
+  $("vendeur").querySelector(`[data-v="${d.vendeur || "part"}"]`).click();
+  $("pays").querySelector(`[data-v="${d.pays || "fr"}"]`).click();
+  dernierEnregistre = JSON.stringify(entrees());
+  analyse();
+  $("estimer").scrollIntoView({ behavior: "smooth" });
+}
+
+$("lancer").addEventListener("click", async () => {
+  analyse();
+  await sauver();
+  $("r-content").scrollIntoView({ behavior: "smooth", block: "nearest" });
+});
+
 
 function seg(id, key){
   $(id).addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
     state[key] = b.dataset.v;
     $(id).querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
-    analyse();
+    majEtat();
   });
 }
 seg("vendeur", "vendeur"); seg("pays", "pays");
-["marque","autre-marque","annee","km","prix"].forEach(id => $(id).addEventListener("input", analyse));
-$("type").addEventListener("input", () => { remplirMarques($("type").value); analyse(); });
+["marque","autre-marque","annee","km","prix"].forEach(id => $(id).addEventListener("input", majEtat));
+$("type").addEventListener("input", () => { remplirMarques($("type").value); majEtat(); });
 remplirMarques("");
-analyse();
+majEtat();
 
 /* Lecture d'une annonce collée : lien (mots du lien) ou texte libre */
 function lireAnnonce(){
@@ -765,9 +1186,9 @@ function lireAnnonce(){
   }
   remplirMarques($("type").value);
   if (marque && PAR_TYPE[$("type").value].includes(marque)) { $("marque").value = marque; found.push("marque"); }
-  const km = t.match(/(\d{1,3}(?:[ .\u00a0]?\d{3})+|\d{4,6})\s*km/);
+  const km = t.match(/(?<!\d)(\d{1,3}(?:[ .\u00a0]\d{3})+|\d{4,6})\s*km/);
   if (km) { $("km").value = km[1].replace(/\D/g,""); found.push("kilométrage"); }
-  const prix = t.match(/(\d{1,3}(?:[ .\u00a0]?\d{3})+|\d{4,6})\s*(?:€|eur)/);
+  const prix = t.match(/(?<!\d)(\d{1,3}(?:[ .\u00a0]\d{3})+|\d{4,6})\s*(?:€|eur)/);
   if (prix) { $("prix").value = prix[1].replace(/\D/g,""); found.push("prix"); }
   const an = t.replace(/\d+\s*km/g,"").match(/\b(19[9]\d|20[0-2]\d)\b/);
   if (an) { $("annee").value = an[1]; found.push("année"); }
@@ -777,7 +1198,7 @@ function lireAnnonce(){
   msg.textContent = found.length
     ? "Repéré : " + found.join(", ") + "." + (missing.length ? " À vérifier ou compléter : " + missing.join(", ") + "." : "")
     : "Rien de reconnu dans ce lien. Collez plutôt le texte de l'annonce (titre, prix, kilométrage).";
-  analyse();
+  majEtat();
 }
 $("lire").addEventListener("click", lireAnnonce);
 
@@ -853,7 +1274,7 @@ async function lirePlaque(){
     if (d.marque && PAR_TYPE[$("type").value]) { if (PAR_TYPE[$("type").value].includes(d.marque)) $("marque").value = d.marque; else { $("marque").value = "Autre marque"; $("autre-marque").value = d.marque; } }
     if (d.annee) $("annee").value = d.annee;
     msg.textContent = "Véhicule trouvé. Ajoutez le kilométrage et le prix demandé.";
-    analyse();
+    majEtat();
   } catch { msg.textContent = "Recherche impossible pour le moment. Complétez le formulaire ci-dessous."; }
 }
 $("lire-plaque").addEventListener("click", lirePlaque);
@@ -872,6 +1293,8 @@ $("wl").addEventListener("submit", async e => {
     $("wl").reset();
   } catch { msg.textContent = "L'envoi a échoué. Réessayez dans un instant."; }
 });
+
+Compte.init().then(apresAuth);
 </script>
 </body>
 </html>
