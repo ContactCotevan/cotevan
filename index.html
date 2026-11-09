@@ -1202,6 +1202,8 @@ function traduire(m){
   if (/already registered|already been registered/i.test(m)) return "Un compte existe déjà avec cet e-mail. Connectez-vous.";
   if (/Email not confirmed/i.test(m)) return "Confirmez d'abord votre adresse avec le lien reçu par e-mail.";
   if (/at least/i.test(m)) return "Le mot de passe doit contenir au moins 8 caractères.";
+  if (/rate limit|security purposes|too many/i.test(m)) return "Trop de demandes en peu de temps. Patientez quelques minutes avant de réessayer.";
+  if (/invalid.*email|email.*invalid/i.test(m)) return "Cette adresse e-mail n'est pas acceptée. Vérifiez-la.";
   return "Une erreur est survenue. Réessayez dans un instant.";
 }
 const niveau = () => !user ? 0 : (user.premium ? 2 : 1);
