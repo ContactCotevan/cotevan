@@ -187,7 +187,8 @@ details p{margin-top:10px;color:var(--muted);max-width:46em}
 .join{background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;border-radius:24px;padding:44px;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center}
 .join h2{color:#fff}
 .join p{color:rgba(255,255,255,.82);margin-top:12px}
-.join form{display:grid;gap:12px}
+.join form,.join-cta{display:grid;gap:12px}
+.join-cta p{margin:0;text-align:center}
 .join label{color:#fff}
 .join input,.join select{border-color:transparent}
 .join .btn{background:#fff;color:var(--blue);border-color:#fff}
@@ -357,7 +358,6 @@ label.check input{width:auto}
       <a href="#offres" data-nav="offres">Offres</a>
       <a href="#tarifs" data-nav="tarifs-page">Tarifs</a>
       <a href="#faq" data-nav="faq-page">FAQ</a>
-      <a class="btn small ghost hide-m" href="#rejoindre">Accès anticipé</a>
     </div>
     <button class="btn small" type="button" id="nav-compte">Se connecter</button>
   </nav>
@@ -410,23 +410,13 @@ label.check input{width:auto}
 <div class="wrap" id="rejoindre" style="padding:84px 20px 0">
   <div class="join">
     <div>
-      <h2>Accès anticipé</h2>
-      <p>Les premiers inscrits ont le Pass Recherche à 9,90 € au lieu de 19 €.</p>
+      <h2>Créez votre compte gratuit</h2>
+      <p>La cote de chaque véhicule analysé, le comparateur de location et vos rapports enregistrés dans votre espace. Sans carte bancaire.</p>
     </div>
-    <form id="wl" novalidate>
-      <label for="email" style="color:inherit">E-mail
-        <input id="email" type="email" autocomplete="email" placeholder="vous@exemple.fr" required>
-      </label>
-      <label for="profil" style="color:inherit">Vous êtes
-        <select id="profil">
-          <option>Je cherche un camping-car ou un van</option>
-          <option>Je revends des véhicules de loisirs</option>
-          <option>Je veux vendre le mien</option>
-        </select>
-      </label>
-      <button class="btn" type="submit">Réserver ma place</button>
-      <p class="msg" id="wl-msg" role="status"></p>
-    </form>
+    <div class="join-cta">
+      <button class="btn" type="button" data-auth="signup">Créer mon compte gratuit</button>
+      <p>Déjà inscrit ? <button class="auth-lien" type="button" data-auth="login" style="color:#fff">Se connecter</button></p>
+    </div>
   </div>
 </div>
 
@@ -705,7 +695,7 @@ label.check input{width:auto}
         <h3>Rapport vendeur</h3>
         <div class="price">9,90 € <small>/ véhicule</small></div>
         <ul><li>Prix de vente conseillé</li><li>Annonces concurrentes près de chez vous</li><li>Conseils pour vendre plus vite</li></ul>
-        <a class="btn ghost" href="#rejoindre">Choisir</a>
+        <button class="btn ghost" type="button" data-auth="signup">Bientôt : être prévenu</button>
       </div>
       <div class="plan">
         <h3>Revendeur</h3>
@@ -892,6 +882,7 @@ label.check input{width:auto}
       <p class="auth-fine" style="text-align:left;font-size:14px;margin:0" id="auth-intro" hidden></p>
       <label for="auth-email" id="lbl-email">E-mail<input id="auth-email" type="email" autocomplete="email" placeholder="vous@exemple.fr"></label>
       <label for="auth-pw" id="lbl-pw"><span id="auth-pw-txt">Mot de passe</span><input id="auth-pw" type="password" autocomplete="new-password" placeholder="8 caractères minimum"></label>
+      <label class="check" for="auth-news" id="lbl-news" style="font-weight:500;font-size:14px;align-items:flex-start;padding-bottom:0"><input id="auth-news" type="checkbox" style="margin-top:3px"> Recevoir les bons plans et nouveautés Cotevan par e-mail (désinscription en un clic)</label>
       <label for="auth-pw2" id="lbl-pw2" hidden>Confirmer le mot de passe<input id="auth-pw2" type="password" autocomplete="new-password" placeholder="Retapez le mot de passe"></label>
       <button class="btn" type="submit" id="auth-submit">Créer mon compte</button>
       <button class="auth-lien" type="button" id="auth-oubli" hidden>Mot de passe oublié ?</button>
@@ -1117,7 +1108,7 @@ const Compte = {
       if (evt === "PASSWORD_RECOVERY" && authMode !== "reset-ok" && authMode !== "reset") ouvrirAuth("reset");
     });
   },
-  async signUp(email, pw){
+  async signUp(email, pw, news){
     if (INDISPO) throw errIndispo();
     if (DEMO) {
       const u = store.get("cv_demo_users", {});
@@ -1125,7 +1116,7 @@ const Compte = {
       u[email] = pw; store.set("cv_demo_users", u); store.set("cv_demo_session", email);
       user = { id: email, email, premium: false, pro: false }; return { connecte: true };
     }
-    const { data, error } = await sb.auth.signUp({ email, password: pw, options: { emailRedirectTo: location.origin + location.pathname } });
+    const { data, error } = await sb.auth.signUp({ email, password: pw, options: { emailRedirectTo: location.origin + location.pathname, data: { newsletter: !!news, newsletter_le: news ? new Date().toISOString() : null } } });
     if (error) throw new Error(traduire(error.message));
     if (data.session) { user = mapUser(data.user); return { connecte: true }; }
     return { connecte: false };
@@ -1245,6 +1236,7 @@ function majAuth(){
   $("lbl-email").hidden = reset;
   $("lbl-pw").hidden = oubli || fini;
   $("lbl-pw2").hidden = !reset || fini;
+  $("lbl-news").hidden = !su;
   $("auth-oubli").hidden = !log;
   $("auth-retour").hidden = !oubli;
   $("auth-intro").hidden = !special || fini;
@@ -1300,7 +1292,7 @@ $("auth-form").addEventListener("submit", async e => {
   $("auth-submit").disabled = true;
   try {
     if (authMode === "signup") {
-      const r = await Compte.signUp(email, pw);
+      const r = await Compte.signUp(email, pw, $("auth-news").checked);
       if (!r.connecte) { authMsg("Compte créé. Cliquez sur le lien envoyé à " + email + " pour l'activer, puis connectez-vous."); return; }
     } else await Compte.signIn(email, pw);
     fermerAuth(); $("auth-pw").value = "";
@@ -1589,20 +1581,6 @@ async function lirePlaque(){
 }
 $("lire-plaque").addEventListener("click", lirePlaque);
 $("plaque").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); lirePlaque(); } });
-
-$("wl").addEventListener("submit", async e => {
-  e.preventDefault();
-  const email = $("email").value.trim(), msg = $("wl-msg");
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.textContent = "Cette adresse e-mail n'est pas valide. Vérifiez-la et réessayez."; return; }
-  if (!FORM_ENDPOINT) { msg.textContent = "Inscriptions bientôt ouvertes : la liste d'attente n'est pas encore branchée sur cette version du site."; return; }
-  msg.textContent = "Envoi…";
-  try {
-    const r = await fetch(FORM_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify({ email, profil: $("profil").value, _subject: "Nouvelle inscription Cotevan" }) });
-    if (!r.ok) throw new Error();
-    msg.textContent = "C'est noté. Vous recevrez votre accès par e-mail.";
-    $("wl").reset();
-  } catch { msg.textContent = "L'envoi a échoué. Réessayez dans un instant."; }
-});
 
 /* =====================================================================
    RECHERCHES, OFFRES DES REVENDEURS, ESPACE PRO
