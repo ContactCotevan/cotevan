@@ -333,7 +333,8 @@ footer .logo svg{width:26px;height:26px}
 .hero-home{padding:64px 0 76px;display:grid;gap:18px;justify-items:start}
 .hero-home h1{font-size:clamp(38px,5.6vw,64px);font-weight:800;letter-spacing:-.035em;margin:6px 0 0}
 .hero-home h1 em{font-style:normal;color:var(--blue)}
-.choices{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;max-width:920px;margin-top:10px}
+.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;max-width:1120px;margin-top:10px}
+@media (max-width:980px){.choices{grid-template-columns:1fr 1fr}}
 .choice{display:grid;gap:10px;align-content:start;background:#fff;border:1.5px solid var(--line);border-radius:22px;padding:28px;text-decoration:none;color:var(--ink);box-shadow:0 24px 50px -36px rgba(17,52,120,.45);transition:transform .15s,border-color .15s,box-shadow .15s}
 .choice:hover{transform:translateY(-3px);border-color:var(--blue);box-shadow:0 30px 60px -34px color-mix(in srgb,var(--blue) 70%, transparent)}
 .choice-ico{display:grid;place-items:center;width:52px;height:52px;border-radius:14px;background:var(--blue-soft);color:var(--blue)}
@@ -382,7 +383,7 @@ label.check input{width:auto}
 @media (max-width:520px){.rech-form,.filters,.off-form,.pro-contact{grid-template-columns:1fr}}
 @media (max-width:640px){
   nav{flex-wrap:wrap}
-  .navlinks{width:100%;order:3;overflow-x:auto;gap:18px;padding-bottom:2px}
+  .navlinks{width:100%;order:3;overflow-x:auto;gap:14px;font-size:14px;justify-content:space-between;padding-bottom:2px}
   .navlinks a:not(.btn){display:inline-block !important;white-space:nowrap}
   #nav-compte{order:2;white-space:nowrap}
   .logo{order:1}
@@ -397,7 +398,7 @@ label.check input{width:auto}
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "Cotevan", "url": "https://cotevan.fr/", "logo": "https://cotevan.fr/logo-icone-512.png"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Cotevan", "url": "https://cotevan.fr/", "inLanguage": "fr-FR"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Cotevan", "url": "https://cotevan.fr/", "applicationCategory": "BusinessApplication", "operatingSystem": "Web", "inLanguage": "fr-FR", "description": "Estimation de la cote d'un camping-car, fourgon ou van aménagé d'occasion, et comparateur du prix total d'une location.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR", "description": "Compte gratuit"}}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "D'où vient la cote ?", "acceptedAnswer": {"@type": "Answer", "text": "Cotevan part du prix neuf de référence du type de véhicule et de sa marque, applique une décote moyenne selon l'âge, puis ajuste selon le kilométrage, le vendeur, les équipements et l'état que vous déclarez. Le rapport complet détaille chaque étape du calcul. La fourchette s'élargit quand le modèle est rare."}}, {"@type": "Question", "name": "Est-ce que ça remplace une inspection ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. Cotevan vous dit si le prix est cohérent et quoi vérifier. L'étanchéité de la cellule, en particulier, se contrôle sur place avec un humidimètre ou par un professionnel."}}, {"@type": "Question", "name": "Pourquoi comparer avec l'Allemagne ?", "acceptedAnswer": {"@type": "Answer", "text": "C'est le premier marché européen des véhicules de loisirs, avec beaucoup d'offre. Cotevan ajoute les frais d'un achat là-bas (déplacement ou convoyage, quitus fiscal, contrôle technique, carte grise française) pour savoir si l'écart vaut le voyage."}}, {"@type": "Question", "name": "Le comparateur de location est-il gratuit ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui, avec un compte gratuit."}}, {"@type": "Question", "name": "D'où viennent les offres des revendeurs ?", "acceptedAnswer": {"@type": "Answer", "text": "Elles sont publiées directement par des professionnels abonnés, avec un lien vers leur propre annonce. Cotevan calcule la cote de chaque véhicule de la même façon que pour vos analyses, que le verdict soit favorable ou non au vendeur."}}, {"@type": "Question", "name": "Le comparatif de location est-il neutre ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui. Le même calcul s'applique aux deux types de location, le classement dépend seulement du coût total de votre voyage, et Cotevan ne met en avant aucune plateforme."}}, {"@type": "Question", "name": "Je suis revendeur, c'est pour moi ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui. L'offre Revendeur vous permet de publier vos véhicules (photo, prix, lien vers votre annonce), visibles par les membres avec leur cote, de voir ce que recherchent les acheteurs par type de véhicule, et inclut les rapports complets illimités."}}, {"@type": "Question", "name": "Y a-t-il un abonnement caché ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. Le Rapport et le Pass Recherche se paient une seule fois, sans renouvellement. Seule l'offre Revendeur est mensuelle, sans engagement et résiliable à tout moment."}}, {"@type": "Question", "name": "Que contient l'aperçu gratuit ?", "acceptedAnswer": {"@type": "Answer", "text": "Sans compte, vous voyez le verdict sur le prix : bonne affaire, prix juste ou trop cher. Avec un compte gratuit, vous obtenez aussi la cote estimée, l'écart avec le prix demandé, la fourchette du marché et les points forts et faibles du véhicule. Le rapport complet ajoute le détail du calcul, le prix maximum conseillé, tous les points à vérifier et la stratégie de négociation."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "D'où vient la cote ?", "acceptedAnswer": {"@type": "Answer", "text": "Cotevan part du prix neuf de référence du type de véhicule et de sa marque, applique une décote moyenne selon l'âge, puis ajuste selon le kilométrage, le vendeur, les équipements et l'état que vous déclarez. Le rapport complet détaille chaque étape du calcul. La fourchette s'élargit quand le modèle est rare."}}, {"@type": "Question", "name": "Est-ce que ça remplace une inspection ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. Cotevan vous dit si le prix est cohérent et quoi vérifier. L'étanchéité de la cellule, en particulier, se contrôle sur place avec un humidimètre ou par un professionnel."}}, {"@type": "Question", "name": "Pourquoi comparer avec l'Allemagne ?", "acceptedAnswer": {"@type": "Answer", "text": "C'est le premier marché européen des véhicules de loisirs, avec beaucoup d'offre. Cotevan ajoute les frais d'un achat là-bas (déplacement ou convoyage, quitus fiscal, contrôle technique, carte grise française) pour savoir si l'écart vaut le voyage."}}, {"@type": "Question", "name": "Le comparateur de location est-il gratuit ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui, avec un compte gratuit."}}, {"@type": "Question", "name": "D'où viennent les offres des revendeurs ?", "acceptedAnswer": {"@type": "Answer", "text": "Elles sont publiées directement par des professionnels abonnés, avec un lien vers leur propre annonce. Cotevan calcule la cote de chaque véhicule de la même façon que pour vos analyses, que le verdict soit favorable ou non au vendeur."}}, {"@type": "Question", "name": "Le comparatif de location est-il neutre ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui. Le même calcul s'applique aux deux types de location, le classement dépend seulement du coût total de votre voyage, et Cotevan ne met en avant aucune plateforme."}}, {"@type": "Question", "name": "Je suis revendeur, c'est pour moi ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui. L'offre Revendeur vous permet de publier vos véhicules (photo, prix, lien vers votre annonce), visibles par les membres avec leur cote, de voir ce que recherchent les acheteurs par type de véhicule, et inclut les rapports complets illimités."}}, {"@type": "Question", "name": "Je vends mon camping-car, Cotevan peut m'aider ?", "acceptedAnswer": {"@type": "Answer", "text": "Oui. Le rapport vendeur calcule la cote de votre véhicule selon ses équipements et son état, puis vous donne le prix d'annonce à afficher, un prix de vente rapide, le prix plancher sous lequel ne pas descendre, une annonce prête à publier et la liste des documents à préparer."}}, {"@type": "Question", "name": "Y a-t-il un abonnement caché ?", "acceptedAnswer": {"@type": "Answer", "text": "Non. Le Rapport, le Rapport vendeur et le Pass Recherche se paient une seule fois, sans renouvellement. Seule l'offre Revendeur est mensuelle, sans engagement et résiliable à tout moment."}}, {"@type": "Question", "name": "Que contient l'aperçu gratuit ?", "acceptedAnswer": {"@type": "Answer", "text": "Sans compte, vous voyez le verdict sur le prix : bonne affaire, prix juste ou trop cher. Avec un compte gratuit, vous obtenez aussi la cote estimée, l'écart avec le prix demandé, la fourchette du marché et les points forts et faibles du véhicule. Le rapport complet ajoute le détail du calcul, le prix maximum conseillé, tous les points à vérifier et la stratégie de négociation."}}]}</script>
 </head>
 <body>
 <div class="topbar"><div class="wrap">
@@ -405,6 +406,7 @@ label.check input{width:auto}
     <a class="logo" href="#accueil" aria-label="Cotevan, accueil"><svg viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2f6ff0"/><stop offset="1" stop-color="#1546a8"/></linearGradient></defs><rect width="48" height="48" rx="12" fill="url(#lg)"/><path d="M33.5 14.5A13 13 0 1 0 33.5 33.5" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round"/><path d="M24 24L33 18" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="24" r="3.2" fill="#fff"/></svg><span class="wm">cote<span>van</span></span></a>
     <div class="navlinks">
       <a href="#acheter" data-nav="acheter">Acheter</a>
+      <a href="#vendre" data-nav="vendre">Vendre</a>
       <a href="#louer" data-nav="louer">Louer</a>
       <a href="#offres" data-nav="offres">Offres</a>
       <a href="#tarifs" data-nav="tarifs-page">Tarifs</a>
@@ -421,7 +423,7 @@ label.check input{width:auto}
   <header class="hero-home">
     <span class="kicker"><i></i>Camping-cars · Fourgons · Vans aménagés</span>
     <h1>Le bon camping&#8209;car, <em>au bon prix.</em></h1>
-    <p class="lede">Achat ou location, Cotevan vous donne le vrai prix avant de vous engager. Que voulez-vous faire ?</p>
+    <p class="lede">Achat, vente ou location, Cotevan vous donne le vrai prix avant de vous engager. Que voulez-vous faire ?</p>
     <div class="choices">
       <a class="choice" href="#acheter">
         <span class="choice-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg></span>
@@ -436,6 +438,13 @@ label.check input{width:auto}
         <h2>Comparer une location</h2>
         <p>Coût total entre particuliers et loueurs pros, kilomètres, frais et caution compris.</p>
         <span class="choice-cta">Comparer les locations →</span>
+      </a>
+      <a class="choice" href="#vendre">
+        <span class="choice-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.5 7.5a7 7 0 1 0 0 9"/><path d="M4 10.5h10M4 13.5h10"/></svg></span>
+        <span class="choice-k">Je vends</span>
+        <h2>Fixer mon prix de vente</h2>
+        <p>Prix d'annonce, prix plancher et annonce prête à publier pour vendre vite, sans brader.</p>
+        <span class="choice-cta">Estimer ma vente →</span>
       </a>
     </div>
     <ul class="trust"><li>Compte gratuit</li><li>Sans carte bancaire</li><li>Sans abonnement</li></ul>
@@ -648,6 +657,100 @@ label.check input{width:auto}
 
 </div>
 
+<div class="page" data-page id="vendre" hidden>
+<section id="vendre-s">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Vente</span>
+      <h1 class="page-h">Vendre son camping-car au bon prix</h1>
+      <p>Décrivez votre véhicule : Cotevan vous donne le prix d'annonce à afficher, le prix plancher sous lequel ne pas descendre, et une annonce prête à publier.</p>
+    </div>
+    <div class="demo">
+      <form class="panel form" id="vform" onsubmit="return false">
+        <label class="full" for="v-type">Type de véhicule<select id="v-type"><option value="" selected disabled>Choisir un type</option><option value="van">Van aménagé (type California, Marco Polo)</option><option value="fourgon">Fourgon aménagé</option><option value="profile">Profilé</option><option value="capucine">Capucine</option><option value="integral">Intégral</option><option value="pl">Poids lourd / plus de 3,5 t</option><option value="4x4">Camping-car 4x4 / expédition</option></select></label>
+        <label for="v-marque">Marque<select id="v-marque"></select></label>
+        <label class="full" for="v-autre" id="v-autre-wrap" hidden>Précisez la marque<input id="v-autre" type="text" autocomplete="off" placeholder="Ex. : Laika, Elnagh, Mobilvetta…"></label>
+        <label for="v-modele">Modèle (facultatif)<input id="v-modele" type="text" maxlength="40" placeholder="Ex. : Flash 627, Ocean 6.0"></label>
+        <label for="v-annee">Année<input id="v-annee" type="number" inputmode="numeric" min="1990" max="2026" placeholder="Ex. : 2019"></label>
+        <label for="v-km">Kilométrage<input id="v-km" type="number" inputmode="numeric" min="0" step="1000" placeholder="Ex. : 58000"></label>
+        <div class="full" style="display:grid;gap:6px">
+          <span style="font-size:14px;font-weight:700" id="v-vendeur-l">Vous vendez</span>
+          <div class="seg" role="group" aria-labelledby="v-vendeur-l" id="v-vendeur">
+            <button type="button" data-v="part" aria-pressed="true">En particulier</button>
+            <button type="button" data-v="pro" aria-pressed="false">En professionnel</button>
+          </div>
+        </div>
+        <details class="full opts" id="v-opts" open>
+          <summary>Équipements et état <small id="v-opts-n">plus c'est précis, plus le prix est juste</small></summary>
+          <p class="opts-h">Équipements présents</p>
+          <div class="chips" id="v-opt-equip"></div>
+          <p class="opts-h">État et historique</p>
+          <div class="chips" id="v-opt-etat"></div>
+        </details>
+        <button class="btn full" type="button" id="v-lancer" disabled>Estimer mon prix de vente</button>
+      </form>
+
+      <div class="panel result" aria-live="polite">
+        <div class="empty" id="v-empty">
+          <div class="empty-ico" aria-hidden="true"><svg viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#1d5bd8"/><path d="M33.5 14.5A13 13 0 1 0 33.5 33.5" fill="none" stroke="#fff" stroke-width="4.2" stroke-linecap="round"/><path d="M24 24L33 18" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="24" r="3.2" fill="#fff"/></svg></div>
+          <h3>Votre prix de vente apparaîtra ici</h3>
+          <p id="v-manque">Renseignez le type, la marque, l'année et le kilométrage.</p>
+        </div>
+        <div class="result" id="v-content" hidden>
+          <div class="rhead"><h3 id="v-title"></h3><span class="pill good">Estimation vendeur</span></div>
+          <div class="lockwrap" id="vlock1">
+            <div class="lockbody">
+              <div class="kv">
+                <div><span>Cote du marché</span><strong id="v-cote">–</strong></div>
+                <div><span>Fourchette basse</span><strong id="v-lo">–</strong></div>
+                <div><span>Fourchette haute</span><strong id="v-hi">–</strong></div>
+              </div>
+              <div>
+                <h3 class="h4">Ce qui fera vendre votre véhicule</h3>
+                <ul class="checks" id="v-forts"></ul>
+              </div>
+              <div class="lockwrap" id="vlock2">
+                <div class="lockbody nego">
+                  <h3 class="h4">Votre stratégie de vente</h3>
+                  <div class="kv">
+                    <div><span>Prix d'annonce</span><strong id="v-annonce">–</strong></div>
+                    <div><span>Vente rapide</span><strong id="v-rapide">–</strong></div>
+                    <div><span>Prix plancher</span><strong id="v-plancher">–</strong></div>
+                  </div>
+                  <ul class="checks args" id="v-strat"></ul>
+                  <h3 class="h4">Avant de publier : ce qui vous fera gagner de l'argent</h3>
+                  <ul class="checks" id="v-prepa"></ul>
+                  <h3 class="h4">Votre annonce prête à copier</h3>
+                  <div class="msgs"><div class="msg-card"><header><strong id="v-ann-titre"></strong><button class="copy" type="button" data-copy="v">Copier</button></header><p id="msg-v"></p></div></div>
+                  <h3 class="h4">Documents à préparer</h3>
+                  <ul class="checks" id="v-docs"></ul>
+                </div>
+                <div class="gate">
+                  <span class="gate-tag">Rapport vendeur</span>
+                  <h3>Vendez au bon prix, sans brader</h3>
+                  <p>Prix d'annonce, prix de vente rapide, prix plancher, annonce prête à publier et liste des documents.</p>
+                  <button class="btn" type="button" data-pay="vendeur">Débloquer le rapport vendeur · 9,90 €</button>
+                  <p class="gate-msg" id="v-pay-msg" role="status"></p>
+                </div>
+              </div>
+            </div>
+            <div class="gate">
+              <span class="gate-tag">Compte gratuit</span>
+              <h3>Votre estimation est prête</h3>
+              <p>Créez votre compte gratuit pour voir la cote de votre véhicule et sa fourchette de prix.</p>
+              <button class="btn" type="button" data-auth="signup">Créer un compte gratuit</button>
+              <button class="btn ghost" type="button" data-auth="login">J'ai déjà un compte</button>
+            </div>
+          </div>
+          <p class="note saved" id="v-saved"></p>
+          <p class="note">Estimation indicative fondée sur des moyennes de marché et sur vos déclarations.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
 <div class="page" data-page id="louer" hidden>
 <section id="comparateur">
   <div class="wrap">
@@ -754,8 +857,8 @@ label.check input{width:auto}
       <div class="plan">
         <h3>Rapport vendeur</h3>
         <div class="price">9,90 € <small>/ véhicule</small></div>
-        <ul><li>Prix de vente conseillé selon la cote</li><li>Points forts à mettre en avant dans l'annonce</li><li>Prix plancher pour négocier sereinement</li></ul>
-        <button class="btn ghost" type="button" data-auth="signup">Bientôt : être prévenu</button>
+        <ul><li>Prix d'annonce, de vente rapide et plancher</li><li>Annonce prête à publier avec vos points forts</li><li>Ce qu'il faut faire avant de vendre, et les documents</li></ul>
+        <a class="btn ghost" href="#vendre">Estimer ma vente</a>
       </div>
       <div class="plan">
         <h3>Revendeur</h3>
@@ -783,7 +886,8 @@ label.check input{width:auto}
     <details><summary>D'où viennent les offres des revendeurs ?</summary><p>Elles sont publiées directement par des professionnels abonnés, avec un lien vers leur propre annonce. Cotevan calcule la cote de chaque véhicule de la même façon que pour vos analyses, que le verdict soit favorable ou non au vendeur.</p></details>
     <details><summary>Le comparatif de location est-il neutre ?</summary><p>Oui. Le même calcul s'applique aux deux types de location, le classement dépend seulement du coût total de votre voyage, et Cotevan ne met en avant aucune plateforme.</p></details>
     <details><summary>Je suis revendeur, c'est pour moi ?</summary><p>Oui. L'offre Revendeur vous permet de publier vos véhicules (photo, prix, lien vers votre annonce), visibles par les membres avec leur cote, de voir ce que recherchent les acheteurs par type de véhicule, et inclut les rapports complets illimités.</p></details>
-    <details><summary>Y a-t-il un abonnement caché ?</summary><p>Non. Le Rapport et le Pass Recherche se paient une seule fois, sans renouvellement. Seule l'offre Revendeur est mensuelle, sans engagement et résiliable à tout moment.</p></details>
+    <details><summary>Je vends mon camping-car, Cotevan peut m'aider ?</summary><p>Oui. Le rapport vendeur calcule la cote de votre véhicule selon ses équipements et son état, puis vous donne le prix d'annonce à afficher, un prix de vente rapide, le prix plancher sous lequel ne pas descendre, une annonce prête à publier et la liste des documents à préparer.</p></details>
+    <details><summary>Y a-t-il un abonnement caché ?</summary><p>Non. Le Rapport, le Rapport vendeur et le Pass Recherche se paient une seule fois, sans renouvellement. Seule l'offre Revendeur est mensuelle, sans engagement et résiliable à tout moment.</p></details>
     <details><summary>Que contient l'aperçu gratuit ?</summary><p>Sans compte, vous voyez le verdict sur le prix : bonne affaire, prix juste ou trop cher. Avec un compte gratuit, vous obtenez aussi la cote estimée, l'écart avec le prix demandé, la fourchette du marché et les points forts et faibles du véhicule. Le rapport complet ajoute le détail du calcul, le prix maximum conseillé, tous les points à vérifier et la stratégie de négociation.</p></details>
   </div>
   </div>
@@ -935,6 +1039,18 @@ label.check input{width:auto}
       <a href="/verifier-camping-car-occasion">Points à vérifier</a>
       <a href="/prix-location-camping-car">Prix location camping-car</a>
       <a href="/acheter-camping-car-allemagne">Acheter en Allemagne</a>
+    </nav>
+    <nav class="foot-guides" aria-label="Cotes par modèle"><strong style="color:var(--ink)">Cotes par modèle :</strong>
+      <a href="/cote-vw-california">VW California</a>
+      <a href="/cote-mercedes-marco-polo">Mercedes Marco Polo</a>
+      <a href="/cote-ford-nugget">Ford Nugget</a>
+      <a href="/cote-renault-trafic-spacenomad">Renault SpaceNomad</a>
+      <a href="/cote-fiat-ducato-amenage">Fiat Ducato aménagé</a>
+      <a href="/cote-possl">Pössl</a>
+      <a href="/cote-hymer">Hymer</a>
+      <a href="/cote-chausson">Chausson</a>
+      <a href="/cote-challenger">Challenger</a>
+      <a href="/cote-adria-twin">Adria Twin</a>
     </nav>
     <span>Cotevan n'est affilié à aucun site d'annonces. Estimations indicatives.</span>
   </footer>
@@ -1473,6 +1589,8 @@ const SUPABASE_URL = "https://hduwpblhotzonxxiuxoh.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_v-wS7qE5eglBG9J0iIYiSA_ecXkSWJv";
 /* Liens de paiement Stripe (Payment Links). Vides = paiement pas encore ouvert. */
 const PAIEMENT_RAPPORT = "https://buy.stripe.com/test_9B66oJdyV6hH3xA74AenS00";
+/* Rapport vendeur 9,90 € : à créer dans Stripe (retour : https://cotevan.fr/?paiement=vendeur#vendre) */
+const PAIEMENT_VENDEUR = "";
 const PAIEMENT_PASS = "https://buy.stripe.com/test_5kQfZjcuR8pP9VY74AenS01";
 const PAIEMENT_PRO = "https://buy.stripe.com/test_00waEZ52p8pP2twbkQenS02";       /* abonnement Revendeur 29 €/mois */
 const PORTAIL_CLIENT = "https://billing.stripe.com/p/login/test_9B66oJdyV6hH3xA74AenS00";     /* lien du portail client Stripe (gérer / résilier l'abonnement) */
@@ -1754,6 +1872,7 @@ async function apresAuth(){
     await afficherRapports();
   }
   if (dernierRapport && !$("r-content").hidden) { rendre(dernierRapport.d, dernierRapport.r); await sauver(); }
+  if (derniereVente && !$("v-content").hidden) { rendreVente(derniereVente.d, derniereVente.r); await sauverVente(); }
 }
 
 /* ---------- Affichage du rapport selon le niveau ---------- */
@@ -1819,6 +1938,159 @@ document.addEventListener("click", async e => {
   setTimeout(() => b.textContent = "Copier", 1800);
 });
 
+/* =====================================================================
+   RAPPORT VENDEUR : même moteur de cote, vu du côté vendeur
+   ===================================================================== */
+let derniereVente = null, derniereVenteEnregistree = "";
+const stateV = { vendeur: "part" };
+function entreesVente(){
+  return { type: $("v-type").value, marque: $("v-marque").value, autre: $("v-autre").value.trim(), modele: $("v-modele").value.trim(),
+    annee: +$("v-annee").value, km: +$("v-km").value, vendeur: stateV.vendeur, pays: "fr",
+    opts: [...document.querySelectorAll("#v-opts .chip")].filter(b => b.getAttribute("aria-pressed") === "true" && !b.hidden).map(b => b.dataset.o) };
+}
+function cleVente(e = entreesVente()){
+  const t = ["vente", e.type, e.marque, e.autre || "", e.annee, e.km, e.vendeur].join("|");
+  let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) >>> 0;
+  return "v" + h.toString(36);
+}
+const niveauVente = e => { const n = niveau(); return n === 1 && mesDeblocages.has(cleVente(e)) ? 2 : n; };
+function manquantsVente(){
+  const m = [];
+  if (!$("v-type").value) m.push("le type"); if (!$("v-marque").value) m.push("la marque");
+  if (!$("v-annee").value) m.push("l'année"); if ($("v-km").value === "") m.push("le kilométrage");
+  return m;
+}
+function majVente(){
+  $("v-autre-wrap").hidden = $("v-marque").value !== "Autre marque";
+  const t = $("v-type").value;
+  document.querySelectorAll("#v-opt-equip .chip").forEach(b => { const o = OPTS[b.dataset.o]; b.hidden = !!(o.types && t && !o.types.includes(t)); });
+  const n = [...document.querySelectorAll("#v-opts .chip")].filter(b => b.getAttribute("aria-pressed") === "true").length;
+  $("v-opts-n").textContent = n ? `${n} renseigné${n > 1 ? "s" : ""}` : "plus c'est précis, plus le prix est juste";
+  const m = manquantsVente();
+  $("v-lancer").disabled = m.length > 0;
+  $("v-empty").hidden = false; $("v-content").hidden = true;
+  $("v-manque").textContent = m.length ? "Il reste à renseigner : " + m.join(", ") + "." : "Tout est prêt. Cliquez sur « Estimer mon prix de vente ».";
+}
+const r500 = n => Math.round(n / 500) * 500;
+function calculVente(d){
+  const r = calcul({ ...d, prix: 1, pays: "fr" });
+  const a = k => (d.opts || []).includes(k);
+  const equip = (d.opts || []).filter(o => OPTS[o]).map(o => OPTS[o].l.toLowerCase());
+  const nom = d.modele ? `${r.nom} ${d.modele}` : r.nom;
+  const titre = `${LABEL[d.type]} · ${nom} · ${d.annee}`;
+  /* prix d'annonce : cote + marge de négociation (≈ 5 %), arrondi « vendeur » ; vente rapide : sous la cote ; plancher : ce que les acheteurs déduiront */
+  const annonce = Math.max(r500(r.vFr * 1.05), r100(r.vFr) + 500) - 100;
+  const rapide = r100(r.vFr * 0.97);
+  const provTot = r.prov.reduce((s, x) => s + x[1], 0);
+  const plancher = Math.min(rapide - 300, r100(r.vFr * 0.95 - provTot * 0.5));
+  const strat = [
+    `Affichez ${eur(annonce)} : vous gardez une marge d'environ ${eur(annonce - r.vFr)} pour la négociation tout en restant dans la fourchette du marché.`,
+    `Pour vendre en moins de deux semaines, visez ${eur(rapide)}, juste sous la cote : votre annonce sortira en tête des comparaisons.`,
+    `Ne descendez pas sous ${eur(plancher)} : en dessous, vous perdez de l'argent par rapport au marché.`,
+    "Le printemps est la meilleure saison pour vendre : la demande monte de mars à juin. En hiver, comptez un peu plus de négociation."
+  ];
+  if (d.vendeur === "pro") strat.push("En professionnel, mettez en avant la garantie et la préparation du véhicule : elles justifient un prix au-dessus des particuliers.");
+  const prepa = [];
+  if (!a("etanch")) prepa.push("Faites un contrôle d'étanchéité (environ 200 €) : c'est la première question des acheteurs, et sans lui ils négocieront bien plus.");
+  if (!a("entretien")) prepa.push("Rassemblez toutes les factures d'entretien dans une pochette : un historique complet rassure et limite la négociation.");
+  if (!a("pneus") && r.age >= 4) prepa.push(`Vérifiez la date des pneus (code DOT). S'ils ont plus de 6 ans, l'acheteur déduira environ ${eur(PNEUS[d.type])}.`);
+  if (a("humid")) prepa.push("Traces d'humidité : faites-les chiffrer, voire réparer, avant la vente. Les acheteurs les repèrent à l'humidimètre et fuient sans devis.");
+  if (a("carrosserie")) prepa.push("Chocs ou rayures : un débosselage sans peinture coûte souvent moins cher que la baisse de prix demandée.");
+  prepa.push("Nettoyez à fond la cellule et la cabine, et aérez : l'odeur d'humidité fait fuir les acheteurs.");
+  prepa.push("Photos : au moins 15, en extérieur et en plein jour. Vue de trois quarts, chaque pièce, le compteur, le tableau de bord, le moteur et les équipements.");
+  const forts = [...r.forts.filter(x => !/Vente entre particuliers/.test(x))];
+  const ann = `${nom}${d.modele ? "" : " " + LABEL[d.type].toLowerCase()} de ${d.annee}, ${d.km.toLocaleString("fr-FR")} km.\n\n`
+    + (equip.length ? "Équipements : " + equip.join(", ") + ".\n" : "")
+    + (a("entretien") ? "Entretien suivi, toutes les factures disponibles.\n" : "")
+    + (a("etanch") ? "Contrôle d'étanchéité de moins d'un an, facture à l'appui.\n" : "")
+    + (a("pneus") ? "Pneus de moins de 5 ans.\n" : "")
+    + (a("proprio") ? "Première main.\n" : "")
+    + (a("garantie") ? "Encore sous garantie.\n" : "")
+    + "\n[Décrivez l'implantation : couchages, places carte grise, salle d'eau]\n[Raison de la vente]\n\n"
+    + `Prix : ${eur(annonce)}. Visible sur rendez-vous, carte grise et contrôle technique à jour.`;
+  const annTitre = `${nom} ${d.annee} · ${Math.round(d.km / 1000)} 000 km${equip.length ? " · " + equip.slice(0, 2).join(" · ") : ""}`;
+  const docs = ["Carte grise à votre nom, barrée avec la mention « Vendu le … à … heure » et signée le jour de la vente",
+    r.age >= 4 ? "Contrôle technique de moins de 6 mois, obligatoire pour vendre un véhicule de plus de 4 ans" : "Contrôle technique : pas encore obligatoire avant 4 ans, mais un CT récent rassure",
+    "Certificat de situation administrative (non-gage) de moins de 15 jours, gratuit sur le site de l'ANTS",
+    "Rapport HistoVec à partager avec l'acheteur : il prouve l'historique du véhicule",
+    "Déclaration de cession à faire en ligne sur le site de l'ANTS dans les 15 jours",
+    "Factures d'entretien, des équipements ajoutés et du dernier contrôle d'étanchéité"];
+  return { ...r, titre, nom, annonce, rapide, plancher, strat, prepa, forts, ann, annTitre, docs };
+}
+function rendreVente(d, r){
+  derniereVente = { d, r };
+  const lvl = niveauVente(d);
+  $("vlock1").classList.toggle("locked", lvl === 0);
+  $("vlock2").classList.toggle("locked", lvl === 1);
+  $("v-saved").textContent = "";
+  if (lvl >= 1) {
+    $("v-cote").textContent = eur(r.vFr); $("v-lo").textContent = eur(r.lo); $("v-hi").textContent = eur(r.hi);
+    $("v-forts").innerHTML = r.forts.slice(0, 6).map(x => `<li>${x}</li>`).join("");
+  } else {
+    ["v-cote","v-lo","v-hi"].forEach(id => $(id).textContent = MASQUE);
+    $("v-forts").innerHTML = "<li>Point fort de votre véhicule</li><li>Point fort de votre véhicule</li>";
+  }
+  if (lvl >= 2) {
+    $("v-annonce").textContent = eur(r.annonce); $("v-rapide").textContent = eur(r.rapide); $("v-plancher").textContent = eur(r.plancher);
+    $("v-strat").innerHTML = r.strat.map(x => `<li>${x}</li>`).join("");
+    $("v-prepa").innerHTML = r.prepa.map(x => `<li>${x}</li>`).join("");
+    $("v-ann-titre").textContent = r.annTitre; $("msg-v").textContent = r.ann;
+    $("v-docs").innerHTML = r.docs.map(x => `<li>${x}</li>`).join("");
+  } else {
+    ["v-annonce","v-rapide","v-plancher"].forEach(id => $(id).textContent = MASQUE);
+    $("v-strat").innerHTML = "<li>Stratégie de prix chiffrée</li><li>Stratégie de prix chiffrée</li>";
+    $("v-prepa").innerHTML = "<li>Ce qu'il faut faire avant de vendre</li>";
+    $("v-ann-titre").textContent = "Votre annonce"; $("msg-v").textContent = "Camping-car à vendre, très bon état, entretien suivi…";
+    $("v-docs").innerHTML = "<li>Document à préparer</li>";
+  }
+}
+function analyseVente(){
+  if (manquantsVente().length) { majVente(); return; }
+  const e = entreesVente();
+  const d = { ...e, annee: Math.min(YEAR_NOW, Math.max(1990, e.annee || 2019)), km: Math.max(0, e.km || 0) };
+  $("v-empty").hidden = true; $("v-content").hidden = false;
+  const r = calculVente(d);
+  $("v-title").textContent = r.titre;
+  rendreVente(d, r);
+}
+async function sauverVente(){
+  if (!user || !derniereVente) return;
+  const e = entreesVente(), cle = JSON.stringify(e);
+  if (cle === derniereVenteEnregistree) { $("v-saved").textContent = "✓ Estimation enregistrée dans votre espace"; return; }
+  try {
+    await Compte.enregistrer("Vente · " + derniereVente.r.titre, { ...e, mode: "vente", cote: Math.round(derniereVente.r.vFr), annonce: niveauVente(derniereVente.d) >= 2 ? derniereVente.r.annonce : null, verdict: "Vente" });
+    derniereVenteEnregistree = cle; $("v-saved").textContent = "✓ Estimation enregistrée dans votre espace";
+    afficherRapports();
+  } catch (err) { $("v-saved").textContent = err.message; }
+}
+function ouvrirVente(d){
+  $("v-type").value = d.type; remplirMarquesSel($("v-marque"), d.type, d.marque);
+  $("v-autre").value = d.autre || ""; $("v-modele").value = d.modele || ""; $("v-annee").value = d.annee; $("v-km").value = d.km;
+  $("v-vendeur").querySelector(`[data-v="${d.vendeur || "part"}"]`).click();
+  document.querySelectorAll("#v-opts .chip").forEach(b => b.setAttribute("aria-pressed", (d.opts || []).includes(b.dataset.o)));
+  derniereVenteEnregistree = JSON.stringify(entreesVente());
+  majVente(); analyseVente();
+  if (location.hash === "#vendre") route(); else location.hash = "#vendre";
+}
+function remplirMarquesSel(sel, type, garder){
+  const avant = garder ?? sel.value;
+  if (!PAR_TYPE[type]) { sel.innerHTML = '<option value="" selected disabled>Choisir d\'abord le type</option>'; sel.disabled = true; return; }
+  sel.disabled = false;
+  sel.innerHTML = '<option value="" disabled>Choisir une marque</option>' + PAR_TYPE[type].map(m => `<option>${m}</option>`).join("");
+  sel.value = PAR_TYPE[type].includes(avant) ? avant : "";
+}
+(function initVente(){
+  $("v-opt-equip").innerHTML = Object.entries(OPTS).map(([k, o]) => `<button type="button" class="chip" data-o="${k}" aria-pressed="false">${o.l}</button>`).join("");
+  $("v-opt-etat").innerHTML = Object.entries(ETATS).map(([k, o]) => `<button type="button" class="chip${o.neg ? " neg" : ""}" data-o="${k}" aria-pressed="false">${o.l}</button>`).join("");
+  $("v-opts").addEventListener("click", e => { const b = e.target.closest(".chip"); if (!b) return; b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true"); majVente(); });
+  $("v-vendeur").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; stateV.vendeur = b.dataset.v; $("v-vendeur").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); majVente(); });
+  ["v-marque","v-autre","v-modele","v-annee","v-km"].forEach(id => $(id).addEventListener("input", majVente));
+  $("v-type").addEventListener("input", () => { remplirMarquesSel($("v-marque"), $("v-type").value); majVente(); });
+  $("v-lancer").addEventListener("click", async () => { analyseVente(); await sauverVente(); $("v-content").scrollIntoView({ behavior: "smooth", block: "nearest" }); });
+  remplirMarquesSel($("v-marque"), "");
+  majVente();
+})();
+
 /* ---------- Enregistrement et espace client ---------- */
 function entrees(){
   return { type: $("type").value, marque: $("marque").value, autre: $("autre-marque").value.trim(), annee: +$("annee").value, km: +$("km").value, prix: +$("prix").value, vendeur: state.vendeur, pays: state.pays, opts: optsChoisies() };
@@ -1841,8 +2113,8 @@ async function afficherRapports(){
   if (!liste.length) { box.innerHTML = '<div class="empty"><h3>Aucun rapport pour l\'instant</h3><p>Lancez une analyse : elle sera enregistrée ici automatiquement.</p></div>'; return; }
   box.innerHTML = liste.map(r => {
     const d = r.donnees || {}, date = new Date(r.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-    const cls = /affaire/i.test(d.verdict) ? "good" : /juste/i.test(d.verdict) ? "warn" : "bad";
-    return `<article class="report"><span class="pill ${cls}" style="justify-self:start">${d.verdict || ""}</span><h3>${r.vehicule}</h3><p class="meta">${date} · ${(d.km || 0).toLocaleString("fr-FR")} km</p><div class="nums"><span>Prix <b>${eur(d.prix || 0)}</b></span><span>Cote <b>${eur(d.cote || 0)}</b></span></div><div class="acts"><button class="btn small" type="button" data-ouvrir="${r.id}">Ouvrir</button><button class="btn small ghost" type="button" data-pdf="${r.id}">PDF</button><button class="btn small ghost" type="button" data-suppr="${r.id}" aria-label="Supprimer">Supprimer</button></div></article>`;
+    const cls = d.mode === "vente" ? "good" : /affaire/i.test(d.verdict) ? "good" : /juste|suspect/i.test(d.verdict) ? "warn" : "bad";
+    return `<article class="report"><span class="pill ${cls}" style="justify-self:start">${d.verdict || ""}</span><h3>${r.vehicule}</h3><p class="meta">${date} · ${(d.km || 0).toLocaleString("fr-FR")} km</p><div class="nums">${d.mode === "vente" ? (d.annonce ? `<span>Prix d'annonce <b>${eur(d.annonce)}</b></span>` : "") : `<span>Prix <b>${eur(d.prix || 0)}</b></span>`}<span>Cote <b>${eur(d.cote || 0)}</b></span></div><div class="acts"><button class="btn small" type="button" data-ouvrir="${r.id}">Ouvrir</button>${d.mode === "vente" ? "" : `<button class="btn small ghost" type="button" data-pdf="${r.id}">PDF</button>`}<button class="btn small ghost" type="button" data-suppr="${r.id}" aria-label="Supprimer">Supprimer</button></div></article>`;
   }).join("");
   box.querySelectorAll("[data-ouvrir]").forEach(b => b.addEventListener("click", () => ouvrirRapport(liste.find(x => x.id == b.dataset.ouvrir))));
   box.querySelectorAll("[data-pdf]").forEach(b => b.addEventListener("click", () => pdfDepuisSauvegarde(liste.find(x => x.id == b.dataset.pdf), b)));
@@ -1850,6 +2122,7 @@ async function afficherRapports(){
 }
 function ouvrirRapport(r){
   const d = r.donnees || {};
+  if (d.mode === "vente") { ouvrirVente(d); return; }
   $("type").value = d.type; remplirMarques(d.type, d.marque);
   $("autre-marque").value = d.autre || ""; $("annee").value = d.annee; $("km").value = d.km; $("prix").value = d.prix;
   $("vendeur").querySelector(`[data-v="${d.vendeur || "part"}"]`).click();
@@ -2239,7 +2512,7 @@ function surPage(id){
 /* Consentement avant paiement : CGV + renonciation au droit de rétractation (contenu numérique, art. L221-28 13° C. conso) */
 let suiteConsent = null;
 function demanderConsentement(quoi, suite){
-  const libelle = { rapport: "Rapport complet · 4,90 €", pass: "Pass Recherche · 19 € pour 60 jours, sans renouvellement", pro: "Offre Revendeur · 29 € par mois, sans engagement" }[quoi];
+  const libelle = { vendeur: "Rapport vendeur · 9,90 €", rapport: "Rapport complet · 4,90 €", pass: "Pass Recherche · 19 € pour 60 jours, sans renouvellement", pro: "Offre Revendeur · 29 € par mois, sans engagement" }[quoi];
   $("consent-quoi").textContent = libelle;
   $("consent-txt").innerHTML = quoi === "pro"
     ? 'J\'accepte les <a href="/cgv" target="_blank">conditions générales de vente</a> et je souscris en tant que professionnel.'
@@ -2255,16 +2528,21 @@ $("consent").addEventListener("click", e => { if (e.target.id === "consent") $("
 function payer(quoi, msgEl){
   const dire = t => { if (msgEl) msgEl.textContent = t; };
   if (!user) { ouvrirAuth("signup"); authMsg("Créez votre compte (ou connectez-vous) pour continuer vers le paiement."); return; }
-  const lien = { rapport: PAIEMENT_RAPPORT, pass: PAIEMENT_PASS, pro: PAIEMENT_PRO }[quoi];
+  const lien = { rapport: PAIEMENT_RAPPORT, vendeur: PAIEMENT_VENDEUR, pass: PAIEMENT_PASS, pro: PAIEMENT_PRO }[quoi];
   if (!lien) { dire("Le paiement ouvre très bientôt. Vous serez prévenu par e-mail."); return; }
   let ref = user.id + "__" + quoi;
   if (quoi === "rapport") {
     if (!dernierRapport) { location.hash = "#acheter"; return; }
     ref = user.id + "__r-" + cleRapport();
   }
+  if (quoi === "vendeur") {
+    if (!derniereVente) { location.hash = "#vendre"; return; }
+    ref = user.id + "__r-" + cleVente();
+  }
   const url = lien + "?client_reference_id=" + encodeURIComponent(ref) + "&prefilled_email=" + encodeURIComponent(user.email);
   demanderConsentement(quoi, () => {
-    if (quoi !== "pro" && dernierRapport) store.set("cv_attente", entrees());
+    if (quoi === "vendeur" && derniereVente) store.set("cv_attente", { ...entreesVente(), mode: "vente" });
+    else if (quoi !== "pro" && dernierRapport) store.set("cv_attente", entrees());
     location.href = url;
   });
 }
@@ -2293,7 +2571,7 @@ async function retourPaiement(){
 }
 
 /* ---------- Pages (navigation par #adresse) ---------- */
-const TITRES = { offres: "Offres des revendeurs · Cotevan", "espace-pro": "Espace pro · Cotevan", accueil: "Cotevan", acheter: "Estimer un achat · Cotevan", louer: "Comparer une location · Cotevan", "tarifs-page": "Tarifs · Cotevan", "faq-page": "FAQ · Cotevan", "mon-espace": "Mon espace · Cotevan" };
+const TITRES = { vendre: "Vendre son camping-car au bon prix · Cotevan", offres: "Offres des revendeurs · Cotevan", "espace-pro": "Espace pro · Cotevan", accueil: "Cotevan", acheter: "Estimer un achat · Cotevan", louer: "Comparer une location · Cotevan", "tarifs-page": "Tarifs · Cotevan", "faq-page": "FAQ · Cotevan", "mon-espace": "Mon espace · Cotevan" };
 function route(){
   const h = decodeURIComponent(location.hash.slice(1)) || "accueil";
   const el = /^[\w-]+$/.test(h) ? document.getElementById(h) : null;
