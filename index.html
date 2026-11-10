@@ -263,6 +263,31 @@ footer .logo svg{width:26px;height:26px}
 .more-note:empty{display:none}
 .nego{border-top:1px solid var(--line);padding-top:16px}
 .kv2{grid-template-columns:1fr 1fr}
+.opts{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:#fff}
+.opts summary{cursor:pointer;font-weight:700;font-size:14px;list-style:none;display:flex;gap:8px;align-items:baseline}
+.opts summary::-webkit-details-marker{display:none}
+.opts summary small{font-weight:500;color:var(--muted);flex:1}
+.opts summary::after{content:"+";font-size:20px;line-height:1;color:var(--blue)}
+.opts[open] summary::after{content:"−"}
+.opts-h{font-size:13px;font-weight:700;color:var(--muted);margin:14px 0 8px}
+.opts-note{font-size:12.5px;color:var(--muted);margin:12px 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:7px 12px;font:600 13px var(--body);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+.chip.neg[aria-pressed="true"]{background:#fdecea;border-color:var(--bad);color:var(--bad)}
+.chip[aria-pressed="true"]::before{content:"✓ "}
+.pf2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pf2 .box{border-radius:12px;padding:12px 14px;background:var(--tint)}
+.pf2 h4{margin:0 0 6px;font-size:14px}
+.pf2 .plus h4{color:var(--good)} .pf2 .moins h4{color:var(--bad)}
+.pf2 ul{margin:0;padding-left:18px;font-size:13.5px;display:grid;gap:4px}
+.calc{width:100%;border-collapse:collapse;font-size:13.5px;margin-bottom:8px}
+.calc td{padding:7px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.calc td:last-child{text-align:right;font-family:var(--mono);white-space:nowrap;padding-left:10px}
+.calc tr.tot td{font-weight:800}
+.calc tr.prov td{color:var(--muted)}
+#r-pdf{justify-self:start}
+@media (max-width:480px){.pf2{grid-template-columns:1fr}}
 .msgs{display:grid;gap:10px}
 .msg-card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff}
 .msg-card header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:6px}
@@ -284,7 +309,7 @@ footer .logo svg{width:26px;height:26px}
 .report .nums{display:flex;gap:16px;font-size:14px}
 .report .nums b{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .report .acts{display:flex;gap:8px}
-.report .acts button{flex:1}
+.report .acts button{flex:1;padding-left:8px;padding-right:8px}
 .reports .empty{grid-column:1/-1}
 /* modal */
 .modal{position:fixed;inset:0;z-index:50;background:rgba(11,31,58,.45);display:grid;place-items:center;padding:16px}
@@ -518,6 +543,14 @@ label.check input{width:auto}
             <button type="button" data-v="de" aria-pressed="false">Allemagne</button>
           </div>
         </div>
+        <details class="full opts" id="opts">
+          <summary>Équipements et état <small id="opts-n">facultatif, affine la cote</small></summary>
+          <p class="opts-h">Équipements présents</p>
+          <div class="chips" id="opt-equip"></div>
+          <p class="opts-h">État et historique</p>
+          <div class="chips" id="opt-etat"></div>
+          <p class="opts-note">Ce que vous ne cochez pas est considéré comme non confirmé : le rapport chiffre alors les frais à prévoir.</p>
+        </details>
         <button class="btn full" type="button" id="lancer" disabled>Lancer l'analyse</button>
       </form>
 
@@ -545,6 +578,10 @@ label.check input{width:auto}
               <div><span>Prix max conseillé</span><strong id="r-max">–</strong></div>
             </div>
             <div class="import" id="r-import" hidden></div>
+            <div class="pf2">
+              <div class="box plus"><h4>Points forts</h4><ul id="r-forts"></ul></div>
+              <div class="box moins"><h4>Points faibles</h4><ul id="r-faibles"></ul></div>
+            </div>
             <div>
               <h3 class="h4">À vérifier sur ce véhicule</h3>
               <ul class="checks" id="r-checks"></ul>
@@ -552,9 +589,12 @@ label.check input{width:auto}
             </div>
             <div class="lockwrap" id="lock2">
               <div class="lockbody nego">
+                <h3 class="h4">Comment la cote est calculée</h3>
+                <table class="calc"><tbody id="n-calc"></tbody></table>
                 <h3 class="h4">Votre stratégie de négociation</h3>
-                <div class="kv kv2">
+                <div class="kv">
                   <div><span>Offre d'ouverture</span><strong id="n-open">–</strong></div>
+                  <div><span>Dernière offre</span><strong id="n-last">–</strong></div>
                   <div><span>À ne pas dépasser</span><strong id="n-max">–</strong></div>
                 </div>
                 <h3 class="h4">Vos arguments</h3>
@@ -582,7 +622,8 @@ label.check input{width:auto}
           </div>
         </div>
         <p class="note saved" id="r-saved"></p>
-        <p class="note">Estimation indicative, à titre de démonstration. Elle ne remplace pas une inspection du véhicule.</p>
+        <button class="btn small ghost" type="button" id="r-pdf" hidden>Télécharger le rapport en PDF</button>
+        <p class="note">Estimation indicative fondée sur des moyennes de marché. Elle ne remplace pas une inspection du véhicule.</p>
         </div>
       </div>
     </div>
@@ -933,29 +974,43 @@ const $ = id => document.getElementById(id);
 const eur = n => Math.round(n).toLocaleString("fr-FR") + " €";
 const state = { vendeur: "part", pays: "fr" };
 
-/* Modèle de démonstration : prix neuf de référence par type, décote annuelle, ajustements. */
-const NEUF = { van: 72000, fourgon: 60000, profile: 72000, capucine: 64000, integral: 98000, pl: 140000, "4x4": 110000 };
+/* =====================================================================
+   MOTEUR DE COTE
+   Valeur de marché estimée = prix neuf de référence (type × marque)
+   → décote liée à l'âge → ajustement kilométrique → vendeur
+   → équipements déclarés (valeur résiduelle) → état et historique.
+   Les coefficients sont des moyennes de marché : la fourchette affichée
+   reflète l'incertitude, plus large quand les comparables sont rares.
+   ===================================================================== */
+const NEUF = { van: 66000, fourgon: 62000, profile: 76000, capucine: 68000, integral: 105000, pl: 160000, "4x4": 120000 };
 const LABEL = { van: "Van aménagé", fourgon: "Fourgon aménagé", profile: "Profilé", capucine: "Capucine", integral: "Intégral", pl: "Poids lourd", "4x4": "Camping-car 4x4" };
-/* Marques par type. k = tenue de cote (1 = moyenne du marché). */
+/* kilométrage annuel moyen observé par type */
+const KM_AN = { van: 15000, fourgon: 12000, profile: 10000, capucine: 9000, integral: 10000, pl: 10000, "4x4": 12000 };
+/* coût indicatif d'un train de pneus neufs, posé */
+const PNEUS = { van: 700, fourgon: 800, profile: 900, capucine: 900, integral: 1100, pl: 2200, "4x4": 1600 };
+/* k = tenue de cote (1 = moyenne du marché), forts / faibles = réputation de la marque */
+const HDG = { forts: ["Marque haut de gamme recherchée, bonne tenue de cote"], faibles: ["Pièces et entretien plus chers que la moyenne"] };
+const ECO = { forts: ["Prix d'achat accessible"], faibles: ["Finition et isolation plus basiques", "Décote plus rapide que les marques premium"] };
 const MARQUES = {
-  "Volkswagen":{k:1.15,kw:["volkswagen","vw","california","grand california"],tip:"Volkswagen : contrôler la boîte DSG et l'entretien du toit relevable s'il y en a un"},
-  "Mercedes":{k:1.14,kw:["marco polo","mercedes","classe v","vito"],tip:"Mercedes : contrôler la boîte automatique et la corrosion des bas de caisse"},
-  "Ford Nugget":{k:1.05,kw:["nugget"],tip:"Ford : vérifier la courroie de distribution humide du 2.0 EcoBlue"},
-  "Westfalia":{k:1.10,kw:["westfalia"]},
-  "Pössl":{k:1.04,kw:["possl","poessl"]},
-  "Globecar":{k:1.00,kw:["globecar"]},
+  "Volkswagen":{k:1.15,kw:["volkswagen","vw","california","grand california"],tip:"Volkswagen : contrôler l'entretien de la boîte DSG et l'état du soufflet du toit relevable",forts:["Très forte demande à la revente","Conduite et finition proches d'une voiture"],faibles:["Prix d'achat élevé","Boîte DSG et soufflet du toit relevable à surveiller"]},
+  "Mercedes":{k:1.14,kw:["marco polo","mercedes","classe v","vito"],tip:"Mercedes : contrôler la boîte automatique et la corrosion des bas de caisse",forts:["Finition haut de gamme et confort routier"],faibles:["Entretien plus coûteux","Corrosion des bas de caisse sur les anciennes générations"]},
+  "Ford Nugget":{k:1.05,kw:["nugget"],tip:"Ford : vérifier l'entretien de la courroie de distribution humide du 2.0 EcoBlue",forts:["Implantation astucieuse avec cuisine à l'arrière"],faibles:["Courroie de distribution humide du 2.0 EcoBlue à surveiller"]},
+  "Renault":{k:0.90,kw:["renault","trafic","spacenomad","space nomad","master"],tip:"Renault : vérifier l'historique d'entretien et l'état de l'embrayage",forts:["Prix d'achat contenu et consommation modérée"],faibles:["Cote de revente plus faible que Volkswagen ou Mercedes"]},
+  "Westfalia":{k:1.10,kw:["westfalia"],forts:["Marque historique du van aménagé, bonne tenue de cote"]},
+  "Pössl":{k:1.02,kw:["possl","poessl","campster"],forts:["Bon rapport équipement / prix","Réseau de vente étendu"],faibles:["Finition moins soignée que le haut de gamme"]},
+  "Globecar":{k:1.00,kw:["globecar"],forts:["Bon rapport équipement / prix"]},
   "Font Vendôme":{k:1.00,kw:["font vendome"]},
   "Campereve":{k:0.98,kw:["campereve"]},
   "Randger":{k:0.98,kw:["randger"]},
-  "Malibu":{k:1.03,kw:["malibu"]},
+  "Malibu":{k:1.03,kw:["malibu"],forts:["Bonne isolation et finition soignée"]},
   "Dreamer":{k:1.00,kw:["dreamer"]},
-  "Chausson":{k:1.00,kw:["chausson"]},
-  "Challenger":{k:0.98,kw:["challenger"]},
-  "Pilote":{k:1.04,kw:["pilote"]},
-  "Rapido":{k:1.05,kw:["rapido"]},
-  "Hymer":{k:1.12,kw:["hymer"]},
-  "Bürstner":{k:1.04,kw:["burstner","buerstner"]},
-  "Adria":{k:1.03,kw:["adria"]},
+  "Chausson":{k:1.00,kw:["chausson"],forts:["Marque très diffusée en France, revente facile"]},
+  "Challenger":{k:0.98,kw:["challenger"],forts:["Marque très diffusée en France, revente facile"]},
+  "Pilote":{k:1.04,kw:["pilote"],forts:["Constructeur français réputé pour son isolation"]},
+  "Rapido":{k:1.05,kw:["rapido"],forts:["Bonne finition, marque appréciée en France"]},
+  "Hymer":{k:1.12,kw:["hymer"],forts:["Qualité de construction reconnue","Bonne tenue de cote"],faibles:["Pièces et réparations plus chères"]},
+  "Bürstner":{k:1.04,kw:["burstner","buerstner"],forts:["Aménagements intérieurs soignés"]},
+  "Adria":{k:1.03,kw:["adria"],forts:["Bonne qualité de construction"]},
   "Knaus":{k:1.03,kw:["knaus"]},
   "Dethleffs":{k:1.03,kw:["dethleffs"]},
   "Carado":{k:0.95,kw:["carado"]},
@@ -967,7 +1022,7 @@ const MARQUES = {
   "Ahorn":{k:0.92,kw:["ahorn"]},
   "Itineo":{k:0.98,kw:["itineo"]},
   "Frankia":{k:1.12,kw:["frankia"]},
-  "Carthago":{k:1.15,kw:["carthago"]},
+  "Carthago":{k:1.15,kw:["carthago"],forts:["Cellule très bien isolée, construction haut de gamme"],faibles:["Prix d'achat et entretien élevés"]},
   "Niesmann+Bischoff":{k:1.14,kw:["niesmann"]},
   "Le Voyageur":{k:1.08,kw:["le voyageur"]},
   "Morelo":{k:1.12,kw:["morelo"]},
@@ -980,15 +1035,54 @@ const MARQUES = {
   "VW Syncro":{k:1.15,kw:["syncro"],tip:"VW Syncro : véhicule de collection, faire expertiser la mécanique et la rouille"},
   "Autre marque":{k:0.97,kw:[]}
 };
+/* Marques saisies en texte libre (« Autre marque ») : tenue de cote connue */
+const AUTRES = [[/laika/,1.04],[/la strada/,1.08],[/elnagh/,0.93],[/mobilvetta/,0.97],[/giottiline/,0.95],[/hobby/,1.00],[/weinsberg/,0.98],[/etrusco/,0.95],[/xgo/,0.93],[/clever/,0.98],[/vantourer/,1.00],[/bavaria/,0.97],[/autostar/,1.00],[/fleurette/,1.02],[/eura mobil/,1.05],[/lmc/,0.98],[/fiat|citroen|peugeot|jumper|boxer|ducato/,0.95],[/ford|transit/,0.97]];
 const PAR_TYPE = {
-  van:["Volkswagen","Mercedes","Ford Nugget","Westfalia","Pössl","Campereve","Randger","Font Vendôme","Hymer","Pilote","Autre marque"],
-  fourgon:["Pössl","Globecar","Font Vendôme","Challenger","Chausson","Adria","Hymer","Malibu","Westfalia","Carado","Pilote","Dreamer","Campereve","Randger","Sun Living","Benimar","Knaus","Autre marque"],
+  van:["Volkswagen","Mercedes","Ford Nugget","Renault","Westfalia","Pössl","Campereve","Randger","Font Vendôme","Hymer","Pilote","Autre marque"],
+  fourgon:["Pössl","Globecar","Font Vendôme","Challenger","Chausson","Adria","Hymer","Malibu","Westfalia","Carado","Pilote","Dreamer","Campereve","Randger","Sun Living","Benimar","Knaus","Renault","Autre marque"],
   profile:["Chausson","Challenger","Bürstner","Hymer","Pilote","Rapido","Benimar","Adria","Knaus","Dethleffs","Carado","Sun Living","Rimor","Roller Team","McLouis","Itineo","Frankia","Autre marque"],
   capucine:["Chausson","Challenger","Benimar","Rimor","Roller Team","Sun Living","Ahorn","McLouis","Dethleffs","Knaus","Autre marque"],
   integral:["Hymer","Rapido","Pilote","Bürstner","Itineo","Frankia","Carthago","Niesmann+Bischoff","Le Voyageur","Knaus","Dethleffs","Challenger","Autre marque"],
   pl:["Morelo","Concorde","Carthago","Niesmann+Bischoff","Phoenix","Volkner","Frankia","Autre marque"],
   "4x4":["Bimobil","Iveco Daily 4x4","Mercedes Sprinter 4x4","VW Syncro","Hymer","Autre marque"]
 };
+const TYPE_PF = {
+  van:{forts:["Se gare partout et sert aussi au quotidien"],faibles:["Espace de vie et rangements limités"]},
+  fourgon:{forts:["Bon compromis entre encombrement et confort"],faibles:["Couchage souvent transversal ou en hauteur"]},
+  profile:{forts:["Espace de vie généreux pour 2 à 4 personnes"],faibles:[]},
+  capucine:{forts:["Nombreux couchages, idéal en famille"],faibles:["Zone de la capucine sensible aux infiltrations"]},
+  integral:{forts:["Cabine intégrée et grand pare-brise panoramique"],faibles:["Pare-brise et entretien plus coûteux"]},
+  pl:{forts:["Grande autonomie et confort de grand voyage"],faibles:["Permis C1 ou C, péages et entretien plus chers"]},
+  "4x4":{forts:["Accès aux pistes et terrains difficiles"],faibles:["Consommation et entretien de la transmission plus élevés"]}
+};
+/* Équipements : v = valeur ajoutée sur un véhicule récent (décroît avec l'âge) */
+const OPTS = {
+  auto:{l:"Boîte automatique",v:4000},
+  toit:{l:"Toit relevable",v:3500,types:["van","fourgon"]},
+  solaire:{l:"Panneau solaire",v:700},
+  lithium:{l:"Batterie lithium",v:1400},
+  chauff:{l:"Chauffage stationnaire",v:900},
+  clim:{l:"Climatisation cellule",v:1300},
+  store:{l:"Store / auvent",v:500},
+  velo:{l:"Porte-vélos",v:300},
+  attelage:{l:"Attelage",v:500},
+  susp:{l:"Suspension pneumatique",v:1800,types:["profile","capucine","integral","pl","fourgon"]},
+  sat:{l:"Antenne satellite / TV",v:500},
+  camera:{l:"Caméra de recul / GPS",v:400}
+};
+/* État et historique déclarés : f = effet sur la cote */
+const ETATS = {
+  entretien:{l:"Entretien suivi avec factures",f:0.02},
+  etanch:{l:"Contrôle d'étanchéité de moins d'un an",f:0.015},
+  pneus:{l:"Pneus de moins de 5 ans",f:0},
+  proprio:{l:"Premier propriétaire",f:0.015},
+  garantie:{l:"Garantie en cours",f:0.02},
+  humid:{l:"Traces d'humidité constatées",f:-0.15,neg:true},
+  carrosserie:{l:"Chocs ou rayures visibles",f:-0.03,neg:true}
+};
+const OPT_KW = { auto:/boite auto|bva|automatique|dsg|9g ?tronic|7g ?tronic/, toit:/toit relevable|toit releve|pop ?top/, solaire:/panneau solaire|solaire/, lithium:/lithium/, chauff:/chauffage stationnaire|webasto|eberspacher|truma combi|chauffage gasoil|chauffage diesel/, clim:/clim(atisation)? cellule|clim de toit/, store:/store|auvent/, velo:/porte[ -]velo/, attelage:/attelage/, susp:/suspension pneumatique|suspensions pneumatiques|air ?premium|goldschmitt/, sat:/antenne satellite|parabole|antenne sat/, camera:/camera de recul|camera recul|gps/, entretien:/carnet d'?entretien|factures d'?entretien|entretien suivi/, etanch:/controle d'?etancheite|test d'?etancheite/, pneus:/pneus neufs|pneus recents/, proprio:/premiere main|1ere main|1re main|premier proprietaire/, garantie:/sous garantie|garantie constructeur|garantie \d/ };
+
+const norm = s => (s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 function remplirMarques(type, garder){
   const sel = $("marque"), avant = garder ?? sel.value;
   if (!PAR_TYPE[type]) { sel.innerHTML = '<option value="" selected disabled>Choisir d\'abord le type</option>'; sel.disabled = true; return; }
@@ -997,18 +1091,157 @@ function remplirMarques(type, garder){
   sel.value = PAR_TYPE[type].includes(avant) ? avant : "";
 }
 const YEAR_NOW = 2026;
+const r100 = n => Math.floor(n / 100) * 100;
 
-function cote(d){
-  const age = Math.max(0, YEAR_NOW - d.annee);
-  let v = NEUF[d.type] * MARQUES[d.marque].k;
-  for (let i = 0; i < age; i++) v *= (i === 0 ? 0.86 : i < 10 ? 0.94 : 0.965);
-  v = Math.max(v, NEUF[d.type] * 0.12);
-  const kmAttendu = Math.max(1, age) * 11000;
-  const ecartKm = (d.km - kmAttendu) / 10000;
-  v *= Math.min(1.10, Math.max(0.75, 1 - ecartKm * 0.018));
-  if (d.vendeur === "part") v *= 0.95;
-  return v;
+function infoMarque(d){
+  let m = MARQUES[d.marque] || MARQUES["Autre marque"], nom = d.marque, connue = d.marque !== "Autre marque";
+  if (d.marque === "Autre marque") {
+    const t = norm(d.autre);
+    nom = (d.autre || "").trim() || "Autre marque";
+    const hit = t && Object.entries(MARQUES).find(([n, x]) => n !== "Autre marque" && x.kw.some(k => t.includes(k)));
+    if (hit) { m = hit[1]; nom = hit[0]; connue = true; }
+    else { const x = t && AUTRES.find(([re]) => re.test(t)); if (x) { m = { k: x[1], kw: [] }; connue = true; } }
+  }
+  return { m, nom, connue };
 }
+
+function calcul(d){
+  const { m, nom, connue } = infoMarque(d);
+  const opts = (d.opts || []).filter(o => OPTS[o] || ETATS[o]);
+  const a = k => opts.includes(k);
+  const age = Math.max(0, YEAR_NOW - d.annee);
+  const titre = `${LABEL[d.type]} · ${nom} · ${d.annee}`;
+
+  /* 1. prix neuf de référence et décote liée à l'âge */
+  const neuf = NEUF[d.type] * m.k;
+  let dep = 1;
+  for (let i = 0; i < age; i++) dep *= i === 0 ? 0.88 : i < 5 ? 0.95 : i < 12 ? 0.96 : 0.97;
+  const vAge = Math.max(neuf * dep, neuf * 0.15);
+  /* 2. kilométrage comparé à la moyenne du type */
+  const kmAtt = Math.round(Math.max(0.5, age) * KM_AN[d.type] / 1000) * 1000;
+  const ecK = (d.km - kmAtt) / 10000;
+  const fKm = ecK > 0 ? Math.max(0.8, 1 - ecK * 0.02) : Math.min(1.06, 1 - ecK * 0.01);
+  const vKm = vAge * fKm;
+  /* 3. vente entre particuliers : sans garantie, environ 6 % sous les prix pro */
+  const vVend = vKm * (d.vendeur === "part" ? 0.94 : 1);
+  /* 4. équipements : valeur résiduelle, plafonnée à 15 % */
+  const resid = Math.max(0.35, 1 - 0.07 * age);
+  const equip = opts.filter(o => OPTS[o] && (!OPTS[o].types || OPTS[o].types.includes(d.type)));
+  const vOpts = Math.min(equip.reduce((s, o) => s + OPTS[o].v * resid, 0), vVend * 0.15);
+  /* 5. état et historique déclarés */
+  const fEtat = 1 + opts.filter(o => ETATS[o]).reduce((s, o) => s + ETATS[o].f, 0);
+  const base = vVend + vOpts;
+  const vFr = base * fEtat;
+
+  const calc = [[`Prix neuf de référence (${LABEL[d.type].toLowerCase()}, ${nom})`, neuf],
+    [`Décote liée à l'âge (${age} an${age > 1 ? "s" : ""})`, vAge - neuf],
+    [`Kilométrage : ${d.km.toLocaleString("fr-FR")} km pour ${kmAtt.toLocaleString("fr-FR")} km attendus`, vKm - vAge]];
+  if (d.vendeur === "part") calc.push(["Vente entre particuliers (sans garantie)", vVend - vKm]);
+  if (vOpts > 0) calc.push([`Équipements : ${equip.map(o => OPTS[o].l.toLowerCase()).join(", ")}`, vOpts]);
+  if (fEtat !== 1) calc.push(["État et historique déclarés", vFr - base]);
+
+  /* fourchette : plus large quand les comparables sont rares */
+  const sp = !connue || age > 15 || d.type === "pl" ? 0.10 : 0.07;
+  const lo = vFr * (1 - sp), hi = vFr * (1 + sp);
+  const frais = d.pays === "de" ? 1400 + (d.type === "integral" ? 300 : 0) + (d.type === "pl" ? 600 : 0) : 0;
+  const coutReel = d.prix + frais;
+  const ecart = coutReel - vFr;
+  const pct = ecart / vFr;
+
+  /* frais à prévoir après l'achat (non confirmés par le vendeur) */
+  const prov = [];
+  if (!a("pneus") && age >= 4) prov.push(["Pneus à remplacer (date non confirmée)", PNEUS[d.type]]);
+  if (!a("etanch") && age >= 1) prov.push(["Contrôle d'étanchéité à faire", 200]);
+  if (!a("entretien")) prov.push(["Révision sans historique d'entretien", d.type === "pl" ? 900 : 450]);
+  const provTot = prov.reduce((s, x) => s + x[1], 0);
+  const valeurMax = vFr - provTot - frais;
+
+  const suspect = pct < -0.30;
+  const verdict = suspect ? ["warn", "Prix suspect"] : pct < -0.06 ? ["good", "Bonne affaire"] : pct <= 0.06 ? ["warn", "Prix juste"] : ["bad", "Trop cher"];
+
+  /* négociation : l'offre d'ouverture est toujours sous le plafond, le plafond jamais au-dessus du prix demandé */
+  let plafond, ouverture;
+  if (d.prix > valeurMax) { plafond = r100(valeurMax); ouverture = r100(Math.min(plafond * 0.94, d.prix * 0.9)); }
+  else { plafond = r100(d.prix); ouverture = r100(d.prix * (pct < -0.06 ? 0.97 : 0.95)); }
+  plafond = Math.max(0, plafond); ouverture = Math.max(0, Math.min(ouverture, plafond - 100));
+  const derniere = Math.max(ouverture, Math.min(plafond, r100((ouverture + plafond) / 2)));
+
+  const min = lo * 0.9, span = hi * 1.1 - min;
+  const pos = Math.min(98, Math.max(2, ((coutReel - min) / span) * 100));
+
+  /* points forts / points faibles */
+  const ratioKm = d.km / Math.max(1, kmAtt);
+  const forts = [...(TYPE_PF[d.type].forts || []), ...(m.forts || (m.k >= 1.08 ? HDG.forts : m.k <= 0.95 ? ECO.forts : []))];
+  const faibles = [...(TYPE_PF[d.type].faibles || []), ...(m.faibles || (m.k >= 1.08 ? HDG.faibles : m.k <= 0.95 ? ECO.faibles : []))];
+  if (age <= 3 && !a("garantie")) forts.push("Véhicule récent : la garantie constructeur court peut-être encore, à vérifier");
+  if (age >= 12) faibles.push(`${age} ans : joints, batteries et électronique de cellule à surveiller`);
+  if (ratioKm < 0.7 && age >= 2) forts.push(`Kilométrage faible pour l'âge (${d.km.toLocaleString("fr-FR")} km)`);
+  if (ratioKm > 1.25) faibles.push(`Kilométrage élevé pour l'âge (${d.km.toLocaleString("fr-FR")} km pour ${kmAtt.toLocaleString("fr-FR")} attendus)`);
+  if (equip.length) forts.push("Bien équipé : " + equip.map(o => OPTS[o].l.toLowerCase()).join(", "));
+  ["entretien","etanch","pneus","proprio","garantie"].forEach(k => { if (a(k)) forts.push(ETATS[k].l); });
+  if (a("humid")) faibles.push("Traces d'humidité : risque de réparations lourdes sur la cellule");
+  if (a("carrosserie")) faibles.push("Chocs ou rayures visibles sur la carrosserie");
+  if (d.vendeur === "pro") forts.push("Vendeur professionnel : garantie légale de conformité et recours plus simples");
+  else faibles.push("Vente entre particuliers : pas de garantie de conformité, seulement les vices cachés");
+  if (d.pays === "de") faibles.push("Achat en Allemagne : frais et démarches d'import à prévoir");
+
+  /* points à vérifier */
+  const checks = [];
+  if (a("humid")) checks.push("Humidité constatée : faites mesurer la cellule à l'humidimètre et chiffrer la réparation avant toute offre");
+  checks.push(age >= 4
+    ? "Cellule : exiger les contrôles d'étanchéité annuels. Sans eux, la garantie constructeur tombe et le risque d'infiltration monte"
+    : "Cellule récente : vérifier que les contrôles d'étanchéité annuels ont été faits pour garder la garantie");
+  if (m.tip) checks.push(m.tip);
+  else checks.push("Porteur (souvent Fiat Ducato) : vérifier l'embrayage et la date du dernier changement de distribution");
+  if (d.type === "capucine") checks.push("Capucine : inspecter le joint et le bois au-dessus de la cabine, zone classique d'infiltration");
+  if (d.type === "pl") checks.push("Plus de 3,5 t : permis C1 ou C obligatoire, péages et vignette plus chers, chrono-tachygraphe selon le poids");
+  if (d.type === "4x4") checks.push("4x4 : vérifier les ponts, la boîte de transfert et les traces de chocs sous le châssis");
+  if (d.type === "integral") checks.push("Intégral : l'entretien du pare-brise et des stores cabine coûte plus cher, à inclure dans la négociation");
+  if (d.type === "van" || d.type === "fourgon") checks.push("Aménagement : demander la facture et l'homologation VASP si l'aménagement n'est pas d'origine");
+  if (a("toit")) checks.push("Toit relevable : vérifier le soufflet (déchirures, moisissures) et les vérins");
+  if (d.km / Math.max(1, age) < 5000 && age > 3) checks.push("Kilométrage faible : un véhicule qui roule peu s'abîme aussi. Contrôler pneus, freins et batterie cellule");
+  if (!a("pneus")) checks.push("Pneus : lire la date DOT, à remplacer après 6 ans même si la gomme semble bonne");
+  if (d.type !== "pl") checks.push("PTAC à 3 500 kg ? Le permis B suffit. Au-delà, il faut le permis C1");
+
+  /* arguments de négociation chiffrés */
+  const args = [];
+  if (suspect) args.push(`Prix très inférieur au marché (environ ${eur(-ecart)} sous la cote) : méfiez-vous. Voyez le véhicule et la carte grise avant tout paiement et n'envoyez jamais d'acompte à distance.`);
+  if (d.prix > valeurMax) {
+    if (ecart > 0) args.push(`Le prix demandé dépasse d'environ ${eur(ecart)} la cote estimée de ${eur(vFr)} pour ce véhicule.`);
+    else args.push(`Le prix est proche de la cote, mais ${eur(provTot + frais)} de frais sont à prévoir après l'achat : ils justifient une baisse.`);
+  } else if (!suspect) {
+    args.push(`Le prix est déjà sous la cote d'environ ${eur(-ecart)} : c'est une bonne affaire. Ne tirez pas trop sur la corde, négociez plutôt un geste (révision, pneus, contrôle d'étanchéité).`);
+  }
+  prov.forEach(([l, v]) => args.push(`${l} : environ ${eur(v)} à déduire.`));
+  if (ratioKm > 1.25) args.push(`Kilométrage au-dessus de la moyenne : ${d.km.toLocaleString("fr-FR")} km pour environ ${kmAtt.toLocaleString("fr-FR")} km attendus à cet âge.`);
+  if (a("humid")) args.push("Traces d'humidité : demandez un devis de réparation et déduisez-le intégralement. Sans devis, ne vous engagez pas.");
+  if (a("carrosserie")) args.push("Chocs ou rayures : faites chiffrer la carrosserie et déduisez-la de votre offre.");
+  if (age >= 8) args.push(`À ${age} ans, joints de cellule, batteries et pneus sont à surveiller : chaque frais à prévoir se déduit de votre offre.`);
+  if (d.pays === "de") args.push(`Achat en Allemagne : environ ${eur(frais)} de frais à votre charge (trajet, quitus fiscal, contrôle technique, carte grise française).`);
+  args.push(d.vendeur === "part"
+    ? "Entre particuliers, vous n'avez pas la garantie d'un professionnel : ce risque justifie une remise."
+    : "Chez un professionnel, négociez aussi les extras : garantie prolongée, révision, pneus neufs, contrôle d'étanchéité.");
+
+  const msgs = [
+    ["Premier contact", `Bonjour,\nVotre ${titre} m'intéresse. Avant de me déplacer, pourriez-vous me confirmer le kilométrage exact, la date du dernier contrôle d'étanchéité de la cellule (avec la facture), l'historique d'entretien et la date des pneus ?\nJe suis un acheteur sérieux et disponible rapidement.\nMerci,\n[Prénom]`],
+    ["Proposition après la visite", d.prix > valeurMax
+      ? `Bonjour,\nMerci pour la visite. Au vu des annonces comparables et des frais à prévoir${prov.length ? " (" + prov.map(p => p[0].split(" (")[0].toLowerCase()).join(", ") + ")" : ""}, je peux vous proposer ${eur(ouverture)}, réglés rapidement par virement.\nCette offre vous conviendrait-elle ?\n[Prénom]`
+      : `Bonjour,\nMerci pour la visite, le véhicule me plaît. Je peux vous proposer ${eur(ouverture)} et conclure rapidement, par virement.\nCela vous conviendrait-il ?\n[Prénom]`],
+    ["Dernière offre", `Bonjour,\nJ'ai bien réfléchi à votre ${titre}. Ma dernière proposition est de ${eur(derniere)} : c'est le maximum que je peux mettre au regard du marché.\nSi cela vous convient, je peux venir le chercher cette semaine.\n[Prénom]`]
+  ];
+  const questions = [];
+  if (!a("entretien")) questions.push("Avez-vous les factures d'entretien du porteur et de la cellule ?");
+  questions.push(a("etanch") ? "Puis-je voir la facture du dernier contrôle d'étanchéité et le taux d'humidité relevé ?" : "Quelle est la date du dernier contrôle d'étanchéité, et le taux d'humidité relevé ?");
+  questions.push("Le véhicule a-t-il eu un sinistre ou une infiltration d'eau ?");
+  questions.push(a("proprio") ? "Le contrôle technique est-il à jour, avec quelles remarques ?" : "Combien de propriétaires, et le contrôle technique est-il à jour ?");
+  if (!a("pneus")) questions.push("Quelle est la date des pneus (code DOT) ?");
+  if (equip.length) questions.push("Les équipements (" + equip.map(o => OPTS[o].l.toLowerCase()).join(", ") + ") fonctionnent-ils tous, avec leurs factures ?");
+
+  return { titre, nom, age, vFr, lo, hi, frais, coutReel, ecart, pct, max: plafond, plafond, ouverture, derniere, pos, verdict, suspect,
+           calc, prov, forts, faibles, checks, args, msgs, questions, kmAtt };
+}
+/* compatibilité : cote moyenne d'un véhicule (offres revendeurs) */
+const cote = d => calcul({ autre: "", opts: [], pays: "fr", prix: 0, ...d }).vFr;
 
 function majAutre(){
   const autre = $("marque").value === "Autre marque";
@@ -1026,6 +1259,7 @@ function manquants(){
 /* Appelé à chaque modification : on n'affiche jamais de résultat sans clic sur « Lancer l'analyse » */
 function majEtat(){
   majAutre();
+  majOptsVisibles();
   const m = manquants();
   $("lancer").disabled = m.length > 0;
   $("r-empty").hidden = false;
@@ -1034,69 +1268,188 @@ function majEtat(){
     ? "Il reste à renseigner : " + m.join(", ") + "."
     : "Tout est prêt. Cliquez sur « Lancer l'analyse ».";
 }
+/* puces équipements / état */
+function optsChoisies(){ return [...document.querySelectorAll("#opt-equip .chip, #opt-etat .chip")].filter(b => b.getAttribute("aria-pressed") === "true" && !b.hidden).map(b => b.dataset.o); }
+function poserOpts(liste){ document.querySelectorAll("#opt-equip .chip, #opt-etat .chip").forEach(b => b.setAttribute("aria-pressed", (liste || []).includes(b.dataset.o))); majCompteOpts(); }
+function majCompteOpts(){ const n = optsChoisies().length; $("opts-n").textContent = n ? `${n} renseigné${n > 1 ? "s" : ""}` : "facultatif, affine la cote"; }
+function majOptsVisibles(){
+  const t = $("type").value;
+  document.querySelectorAll("#opt-equip .chip").forEach(b => { const o = OPTS[b.dataset.o]; b.hidden = !!(o.types && t && !o.types.includes(t)); });
+}
+function construireOpts(){
+  $("opt-equip").innerHTML = Object.entries(OPTS).map(([k, o]) => `<button type="button" class="chip" data-o="${k}" aria-pressed="false">${o.l}</button>`).join("");
+  $("opt-etat").innerHTML = Object.entries(ETATS).map(([k, o]) => `<button type="button" class="chip${o.neg ? " neg" : ""}" data-o="${k}" aria-pressed="false">${o.l}</button>`).join("");
+  $("opts").addEventListener("click", e => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") !== "true");
+    majCompteOpts(); majEtat();
+  });
+}
+
 function analyse(){
   majAutre();
   if (manquants().length) { majEtat(); return; }
   $("r-empty").hidden = true;
   $("r-content").hidden = false;
-  const d = {
-    type: $("type").value, marque: $("marque").value,
-    annee: Math.min(YEAR_NOW, Math.max(1990, +$("annee").value || 2019)),
-    km: Math.max(0, +$("km").value || 0), prix: Math.max(0, +$("prix").value || 0),
-    vendeur: state.vendeur, pays: state.pays
-  };
-  const vFr = cote(d);
-  const lo = vFr * 0.92, hi = vFr * 1.08;
-  const frais = d.pays === "de" ? 1400 + (d.type === "integral" ? 300 : 0) : 0;
-  const coutReel = d.prix + frais;
-  const ecart = coutReel - vFr;
-  const max = vFr * 0.97 - frais;
-
-  $("r-title").textContent = `${LABEL[d.type]} · ${d.marque === "Autre marque" && $("autre-marque").value.trim() ? $("autre-marque").value.trim() : d.marque} · ${d.annee}`;
-  $("r-cote").textContent = eur(vFr);
-  $("r-ecart").textContent = (ecart > 0 ? "+" : "−") + eur(Math.abs(ecart));
-  $("r-max").textContent = eur(Math.max(0, max));
-  $("r-lo").textContent = eur(lo * 0.9);
-  $("r-hi").textContent = eur(hi * 1.1);
-
-  const pill = $("r-pill");
-  const pct = ecart / vFr;
-  if (pct < -0.05)      { pill.className = "pill good"; pill.textContent = "Bonne affaire"; }
-  else if (pct <= 0.05) { pill.className = "pill warn"; pill.textContent = "Prix juste"; }
-  else                  { pill.className = "pill bad";  pill.textContent = "Trop cher"; }
-
-  const min = lo * 0.9, span = hi * 1.1 - min;
-  const pos = Math.min(98, Math.max(2, ((coutReel - min) / span) * 100));
-  $("r-mk").style.left = pos + "%";
+  const e = entrees();
+  const d = { ...e, annee: Math.min(YEAR_NOW, Math.max(1990, e.annee || 2019)), km: Math.max(0, e.km || 0), prix: Math.max(0, e.prix || 0) };
+  const r = calcul(d);
+  $("r-title").textContent = r.titre;
   $("r-mk-l").textContent = d.pays === "de" ? "Prix + import" : "Prix demandé";
-  $("r-mk-l").style.left = pos > 70 ? "auto" : "8px";
-  $("r-mk-l").style.right = pos > 70 ? "8px" : "auto";
+  $("r-mk-l").style.left = r.pos > 70 ? "auto" : "8px";
+  $("r-mk-l").style.right = r.pos > 70 ? "8px" : "auto";
+  rendre(d, r);
+}
 
-  const imp = $("r-import");
-  if (d.pays === "de") {
-    imp.hidden = false;
-    imp.textContent = `Achat en Allemagne : environ ${eur(frais)} de frais comptés (aller simple et retour par la route, quitus fiscal, contrôle technique, carte grise française). Le coût réel comparé à la cote française est donc ${eur(coutReel)}.`;
-  } else imp.hidden = true;
+/* =====================================================================
+   RAPPORT PDF : générateur autonome (Helvetica, encodage WinAnsi),
+   sans bibliothèque externe. Le contenu suit le niveau débloqué.
+   ===================================================================== */
+const PDF_W = { F1: [278, 278, 355, 556, 556, 889, 667, 191, 333, 333, 389, 584, 278, 333, 278, 278, 556, 556, 556, 556, 556, 556, 556, 556, 556, 556, 278, 278, 584, 584, 584, 556, 1015, 667, 667, 722, 722, 667, 611, 778, 722, 278, 500, 667, 556, 833, 722, 778, 667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611, 278, 278, 278, 469, 556, 333, 556, 556, 500, 556, 556, 278, 556, 556, 222, 222, 500, 222, 833, 556, 556, 556, 556, 333, 500, 278, 556, 500, 722, 500, 500, 500, 334, 260, 334, 584, 761, 556, 278, 222, 556, 333, 1000, 556, 556, 333, 1000, 667, 333, 1000, 278, 611, 278, 278, 222, 222, 333, 333, 350, 556, 1000, 333, 1000, 500, 333, 944, 278, 500, 667, 278, 333, 556, 556, 556, 556, 260, 556, 333, 737, 370, 556, 584, 333, 737, 333, 400, 584, 333, 333, 333, 556, 537, 278, 333, 333, 365, 556, 834, 834, 834, 611, 667, 667, 667, 667, 667, 667, 1000, 722, 667, 667, 667, 667, 278, 278, 278, 278, 722, 722, 778, 778, 778, 778, 778, 584, 778, 722, 722, 722, 722, 667, 667, 611, 556, 556, 556, 556, 556, 556, 889, 500, 556, 556, 556, 556, 278, 278, 278, 278, 556, 556, 556, 556, 556, 556, 556, 584, 611, 556, 556, 556, 556, 500, 556, 500], F2: [278, 333, 474, 556, 556, 889, 722, 238, 333, 333, 389, 584, 278, 333, 278, 278, 556, 556, 556, 556, 556, 556, 556, 556, 556, 556, 333, 333, 584, 584, 584, 611, 975, 722, 722, 722, 722, 667, 611, 778, 722, 278, 556, 722, 611, 833, 722, 778, 667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611, 333, 278, 333, 584, 556, 333, 556, 611, 556, 611, 556, 333, 611, 611, 278, 278, 556, 278, 889, 611, 611, 611, 611, 389, 556, 333, 611, 556, 778, 556, 556, 500, 389, 280, 389, 584, 761, 556, 278, 278, 556, 500, 1000, 556, 556, 333, 1000, 667, 333, 1000, 278, 611, 278, 278, 278, 278, 500, 500, 350, 556, 1000, 333, 1000, 556, 333, 944, 278, 500, 667, 278, 333, 556, 556, 556, 556, 280, 556, 333, 737, 370, 556, 584, 333, 737, 333, 400, 584, 333, 333, 333, 611, 556, 278, 333, 333, 365, 556, 834, 834, 834, 611, 722, 722, 722, 722, 722, 722, 1000, 722, 667, 667, 667, 667, 278, 278, 278, 278, 722, 722, 778, 778, 778, 778, 778, 584, 778, 722, 722, 722, 722, 667, 667, 611, 556, 556, 556, 556, 556, 556, 889, 556, 556, 556, 556, 556, 278, 278, 278, 278, 611, 611, 611, 611, 611, 611, 611, 584, 611, 611, 611, 611, 611, 556, 611, 556] };
+const PDF_SPECIAL = { "€":128, "‚":130, "„":132, "…":133, "‰":137, "‹":139, "Œ":140, "‘":145, "’":146, "“":147, "”":148, "•":149, "–":150, "—":151, "™":153, "›":155, "œ":156, "Ÿ":159 };
+function pdfOctets(s){
+  s = String(s).replace(/[\u202f\u2009\u00a0]/g, " ").replace(/≥/g, ">=").replace(/≤/g, "<=").replace(/→/g, "->").replace(/[\u2028\u2029]/g, " ").replace(/✓/g, "");
+  let o = "";
+  for (const ch of s) {
+    const c = ch.codePointAt(0);
+    if (PDF_SPECIAL[ch]) o += String.fromCharCode(PDF_SPECIAL[ch]);
+    else if ((c >= 32 && c < 127) || (c >= 160 && c <= 255)) o += ch;
+    else o += "?";
+  }
+  return o;
+}
+function pdfLargeur(octets, police, taille){
+  let w = 0; for (let i = 0; i < octets.length; i++) { const c = octets.charCodeAt(i); w += (c >= 32 ? PDF_W[police][c - 32] : 278) || 278; }
+  return w * taille / 1000;
+}
+function creerPdf(){
+  const W = 595.28, H = 841.89, M = 48;
+  const pages = []; let ops = [], y = H - M;
+  const coul = h => { const n = parseInt(h.slice(1), 16); return [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255].map(x => x.toFixed(3)).join(" "); };
+  const esc = s => s.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+  const P = {
+    W, H, M, get y(){ return y; }, set y(v){ y = v; },
+    nouvellePage(){ pages.push(ops); ops = []; y = H - M; },
+    place(h){ if (y - h < M + 20) P.nouvellePage(); },
+    rect(x, yy, w, h, c){ ops.push(`${coul(c)} rg ${x.toFixed(2)} ${yy.toFixed(2)} ${w.toFixed(2)} ${h.toFixed(2)} re f`); },
+    texte(x, yy, s, { taille = 10, gras = false, c = "#0b1f3a" } = {}){
+      ops.push(`BT /${gras ? "F2" : "F1"} ${taille} Tf ${coul(c)} rg ${x.toFixed(2)} ${yy.toFixed(2)} Td (${esc(pdfOctets(s))}) Tj ET`);
+    },
+    largeur(s, taille, gras){ return pdfLargeur(pdfOctets(s), gras ? "F2" : "F1", taille); },
+    couper(s, larg, taille, gras){
+      const lignes = [];
+      String(s).split("\n").forEach(par => {
+        let l = "";
+        par.split(/\s+/).forEach(m => { const t = l ? l + " " + m : m; if (P.largeur(t, taille, gras) > larg && l) { lignes.push(l); l = m; } else l = t; });
+        lignes.push(l);
+      });
+      return lignes;
+    },
+    para(s, { x = M, larg = W - 2 * M, taille = 10, gras = false, c = "#0b1f3a", inter = 1.4, puce = false } = {}){
+      const dx = puce ? 12 : 0;
+      const ls = P.couper(s, larg - dx, taille, gras);
+      ls.forEach((l, i) => {
+        P.place(taille * inter);
+        if (puce && i === 0) P.rect(x + 1, y - taille * 0.62, 3.5, 3.5, "#1d5bd8");
+        P.texte(x + dx, y - taille, l, { taille, gras, c });
+        y -= taille * inter;
+      });
+      return ls.length;
+    },
+    titre(s){ P.place(40); y -= 14; P.texte(M, y - 13, s, { taille: 13, gras: true, c: "#1d5bd8" }); y -= 22; P.rect(M, y + 2, W - 2 * M, 0.8, "#dde6f2"); y -= 6; },
+    octets(){
+      pages.push(ops);
+      const obj = [];
+      obj[1] = "<< /Type /Catalog /Pages 2 0 R >>";
+      const kids = pages.map((_, i) => `${5 + i * 2} 0 R`).join(" ");
+      obj[2] = `<< /Type /Pages /Kids [${kids}] /Count ${pages.length} >>`;
+      obj[3] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>";
+      obj[4] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>";
+      pages.forEach((o, i) => {
+        const flux = o.join("\n");
+        obj[5 + i * 2] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${6 + i * 2} 0 R >>`;
+        obj[6 + i * 2] = `<< /Length ${flux.length} >>\nstream\n${flux}\nendstream`;
+      });
+      let out = "%PDF-1.4\n%\xe2\xe3\xcf\xd3\n"; const pos = [];
+      for (let i = 1; i < obj.length; i++) { pos[i] = out.length; out += `${i} 0 obj\n${obj[i]}\nendobj\n`; }
+      const xref = out.length;
+      out += `xref\n0 ${obj.length}\n0000000000 65535 f \n` + pos.slice(1).map(p => String(p).padStart(10, "0") + " 00000 n \n").join("");
+      out += `trailer\n<< /Size ${obj.length} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+      const b = new Uint8Array(out.length); for (let i = 0; i < out.length; i++) b[i] = out.charCodeAt(i) & 255;
+      return b;
+    }
+  };
+  return P;
+}
+function pdfRapport(d, r, lvl, date){
+  const P = creerPdf(), { W, M } = P, L = W - 2 * M;
+  /* bandeau */
+  P.rect(0, P.H - 70, W, 70, "#1d5bd8");
+  P.texte(M, P.H - 42, "cotevan", { taille: 22, gras: true, c: "#ffffff" });
+  P.texte(M, P.H - 58, "Rapport d'estimation", { taille: 10, c: "#dbe7ff" });
+  const dt = "Édité le " + (date || new Date()).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  P.texte(W - M - P.largeur(dt, 10), P.H - 42, dt, { taille: 10, c: "#ffffff" });
+  P.y = P.H - 96;
+  P.para(r.titre, { taille: 17, gras: true, inter: 1.3 });
+  P.para(`${d.km.toLocaleString("fr-FR")} km · prix demandé ${eur(d.prix)} · vendeur ${d.vendeur === "pro" ? "professionnel" : "particulier"} · véhicule en ${d.pays === "de" ? "Allemagne" : "France"}`, { taille: 10, c: "#5a6b85" });
+  const choix = (d.opts || []).map(o => (OPTS[o] || ETATS[o] || {}).l).filter(Boolean);
+  if (choix.length) P.para("Déclaré : " + choix.join(", "), { taille: 9.5, c: "#5a6b85" });
+  /* verdict + chiffres clés */
+  P.y -= 10; P.place(70);
+  const vc = { good: "#16865a", warn: "#c27a12", bad: "#c43c33" }[r.verdict[0]];
+  const vw = P.largeur(r.verdict[1], 11, true) + 20;
+  P.rect(M, P.y - 22, vw, 22, vc); P.texte(M + 10, P.y - 15.5, r.verdict[1], { taille: 11, gras: true, c: "#ffffff" });
+  P.y -= 34;
+  const cases = [["Cote estimée", eur(r.vFr)], ["Écart avec le prix", (r.ecart > 0 ? "+" : "-") + eur(Math.abs(r.ecart))], ["Prix max conseillé", lvl >= 2 ? eur(r.plafond) : "Rapport complet"]];
+  const cw = (L - 16) / 3;
+  P.place(52);
+  cases.forEach(([l, v], i) => { const x = M + i * (cw + 8); P.rect(x, P.y - 48, cw, 48, "#f3f7fd"); P.texte(x + 10, P.y - 17, l, { taille: 9, c: "#5a6b85" }); P.texte(x + 10, P.y - 36, v, { taille: 14, gras: true }); });
+  P.y -= 58;
+  P.para(`Fourchette du marché : ${eur(r.lo)} à ${eur(r.hi)}`, { taille: 9.5, c: "#5a6b85" });
+  if (lvl >= 2 && d.pays === "de") P.para(`Achat en Allemagne : environ ${eur(r.frais)} de frais d'import comptés, soit un coût réel de ${eur(r.coutReel)}.`, { taille: 9.5, c: "#5a6b85" });
 
-  const checks = [];
-  const age = YEAR_NOW - d.annee;
-  checks.push(age >= 4
-    ? "Cellule : exiger les contrôles d'étanchéité annuels. Sans eux, la garantie constructeur tombe et le risque d'infiltration monte"
-    : "Cellule récente : vérifier que les contrôles d'étanchéité annuels ont été faits pour garder la garantie");
-  const mq = MARQUES[d.marque];
-  if (mq.tip) checks.push(mq.tip);
-  else if (mq.k >= 1.08) checks.push(`${d.marque} : marque qui tient bien sa cote. Exiger les factures d'entretien, elles font partie du prix`);
-  else if (mq.k <= 0.95 && d.marque !== "Autre marque") checks.push(`${d.marque} : gamme accessible. Vérifier les fixations du mobilier, les joints de baies et le plancher`);
-  else checks.push("Porteur (souvent Fiat Ducato) : vérifier l'embrayage et la date du dernier changement de distribution");
-  if (d.type === "capucine") checks.push("Capucine : inspecter le joint et le bois au-dessus de la cabine, zone classique d'infiltration");
-  if (d.type === "pl") checks.push("Plus de 3,5 t : permis C1 ou C obligatoire, péages et vignette plus chers, chrono-tachygraphe selon le poids");
-  if (d.type === "4x4") checks.push("4x4 : vérifier les ponts, la boîte de transfert et les traces de chocs sous le châssis");
-  if (d.type === "integral") checks.push("Intégral : l'entretien du pare-brise et des stores cabine coûte plus cher, à inclure dans la négociation");
-  if (d.type === "van" || d.type === "fourgon") checks.push("Aménagement : demander la facture et l'homologation VASP si l'aménagement n'est pas d'origine");
-  if (d.km / Math.max(1, age) < 5000 && age > 3) checks.push("Kilométrage faible : un véhicule qui roule peu s'abîme aussi. Contrôler pneus, freins et batterie cellule");
-  checks.push("Pneus : lire la date DOT, à remplacer après 6 ans même si la gomme semble bonne");
-  checks.push("PTAC à 3 500 kg ? Le permis B suffit. Au-delà, il faut le permis C1");
-  rendre(d, { vFr, lo, hi, frais, coutReel, ecart, max, pos, checks });
+  P.titre("Points forts");
+  r.forts.slice(0, 6).forEach(x => P.para(x, { puce: true }));
+  P.titre("Points faibles");
+  (r.faibles.length ? r.faibles.slice(0, 6) : ["Aucun point faible notable"]).forEach(x => P.para(x, { puce: true }));
+
+  if (lvl >= 2) {
+    P.titre("Comment la cote est calculée");
+    const ligne = (l, v, gras) => { const n = P.couper(l, L - 110, 10, gras).length; P.place(n * 14 + 4); const y0 = P.y; P.para(l, { larg: L - 110, gras }); P.texte(W - M - P.largeur(v, 10, gras), y0 - 10, v, { taille: 10, gras }); };
+    r.calc.forEach(([l, v], i) => ligne(l, i === 0 ? eur(v) : (v >= 0 ? "+ " : "- ") + eur(Math.abs(v))));
+    ligne("Cote estimée", eur(r.vFr), true);
+    r.prov.forEach(([l, v]) => ligne(l, "- " + eur(v)));
+    if (r.frais) ligne("Frais d'import", "- " + eur(r.frais));
+    if (r.prov.length || r.frais) ligne("Ce que le véhicule vaut pour vous", eur(r.vFr - r.prov.reduce((s, x) => s + x[1], 0) - r.frais), true);
+  }
+  P.titre("À vérifier sur ce véhicule");
+  (lvl >= 2 ? r.checks.slice(0, 7) : r.checks.slice(0, 1)).forEach(x => P.para(x, { puce: true }));
+
+  if (lvl >= 2) {
+    P.titre("Votre stratégie de négociation");
+    P.place(52);
+    [["Offre d'ouverture", eur(r.ouverture)], ["Dernière offre", eur(r.derniere)], ["À ne pas dépasser", eur(r.plafond)]].forEach(([l, v], i) => { const x = M + i * (cw + 8); P.rect(x, P.y - 48, cw, 48, "#e6efff"); P.texte(x + 10, P.y - 17, l, { taille: 9, c: "#5a6b85" }); P.texte(x + 10, P.y - 36, v, { taille: 14, gras: true, c: "#1d5bd8" }); });
+    P.y -= 60;
+    P.para("Vos arguments", { gras: true, taille: 11 }); P.y -= 2;
+    r.args.forEach(x => P.para(x, { puce: true }));
+    P.titre("Messages prêts à envoyer au vendeur");
+    r.msgs.forEach(([t, m]) => { P.para(t, { gras: true, taille: 10.5 }); P.para(m, { taille: 9.5, c: "#33435c" }); P.y -= 8; });
+    P.titre("Questions à poser au vendeur");
+    r.questions.forEach(x => P.para(x, { puce: true }));
+  } else {
+    P.y -= 12;
+    P.para("Le rapport complet ajoute le détail du calcul, le prix maximum, tous les points à vérifier, votre offre d'ouverture et 3 messages prêts à envoyer au vendeur. Débloquez-le sur cotevan.fr.", { taille: 10, c: "#1d5bd8" });
+  }
+  P.y -= 18;
+  P.para("Estimation indicative fondée sur des moyennes de marché : elle ne remplace pas une inspection du véhicule. cotevan.fr", { taille: 8.5, c: "#8090a8" });
+  return P.octets();
+}
+function telechargerPdf(d, r, lvl, date){
+  const octets = pdfRapport(d, r, lvl, date);
+  const nom = "cotevan-" + norm(r.titre).replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + ".pdf";
+  const url = URL.createObjectURL(new Blob([octets], { type: "application/pdf" }));
+  const a = document.createElement("a"); a.href = url; a.download = nom; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
 /* =====================================================================
@@ -1242,12 +1595,13 @@ function traduire(m){
 const niveau = () => !user ? 0 : (user.premium ? 2 : 1);
 let mesDeblocages = new Set();
 /* Clé courte qui identifie un véhicule analysé (sert au déblocage d'un rapport à l'unité) */
-function cleRapport(){
-  const e = entrees(), t = [e.type, e.marque, e.autre, e.annee, e.km, e.prix, e.vendeur, e.pays].join("|");
+/* les équipements déclarés ne changent pas la clé : un rapport payé reste débloqué si on les modifie */
+function cleRapport(e = entrees()){
+  const t = [e.type, e.marque, e.autre || "", e.annee, e.km, e.prix, e.vendeur, e.pays].join("|");
   let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) >>> 0;
   return h.toString(36);
 }
-const niveauRapport = () => niveau() === 1 && mesDeblocages.has(cleRapport()) ? 2 : niveau();
+const niveauRapport = e => niveau() === 1 && mesDeblocages.has(cleRapport(e)) ? 2 : niveau();
 
 /* ---------- Fenêtre de connexion ---------- */
 let authMode = "signup";
@@ -1372,53 +1726,47 @@ function rendre(d, r){
   $("lock1").classList.toggle("locked", lvl === 0);
   $("lock2").classList.toggle("locked", lvl === 1);
   $("r-saved").textContent = "";
-  const titre = $("r-title").textContent;
+  $("r-pdf").hidden = lvl === 0;
+  /* le verdict fait partie de l'aperçu gratuit */
+  const pill = $("r-pill"); pill.className = "pill " + r.verdict[0]; pill.textContent = r.verdict[1];
 
-  /* niveau 1 et plus : cote, écart, curseur */
+  /* niveau 1 et plus : cote, écart, curseur, points forts / faibles */
   if (lvl >= 1) {
     $("r-cote").textContent = eur(r.vFr);
     $("r-ecart").textContent = (r.ecart > 0 ? "+" : "−") + eur(Math.abs(r.ecart));
     $("r-lo").textContent = eur(r.lo * 0.9); $("r-hi").textContent = eur(r.hi * 1.1);
     $("r-mk").style.left = r.pos + "%";
+    $("r-forts").innerHTML = r.forts.slice(0, 6).map(x => `<li>${x}</li>`).join("");
+    $("r-faibles").innerHTML = r.faibles.slice(0, 6).map(x => `<li>${x}</li>`).join("") || "<li>Aucun point faible notable</li>";
   } else {
     ["r-cote","r-ecart","r-lo","r-hi"].forEach(id => $(id).textContent = MASQUE);
     $("r-mk").style.left = "50%";
+    $("r-forts").innerHTML = "<li>Point fort du modèle</li><li>Point fort du modèle</li>";
+    $("r-faibles").innerHTML = "<li>Point faible du modèle</li><li>Point faible du modèle</li>";
   }
-  /* niveau 2 : prix max, import, tous les points, négociation */
-  $("r-max").textContent = lvl >= 2 ? eur(Math.max(0, r.max)) : "🔒 Rapport complet";
-  if (lvl < 2) $("r-import").hidden = true;
-  const visibles = lvl >= 2 ? r.checks.slice(0, 6) : lvl === 1 ? r.checks.slice(0, 1) : [];
-  const caches = lvl >= 2 ? 0 : Math.max(0, Math.min(6, r.checks.length) - visibles.length);
+  /* niveau 2 : prix max, import, tous les points, calcul détaillé, négociation */
+  $("r-max").textContent = lvl >= 2 ? eur(r.plafond) : "🔒 Rapport complet";
+  const imp = $("r-import");
+  if (lvl >= 2 && d.pays === "de") {
+    imp.hidden = false;
+    imp.textContent = `Achat en Allemagne : environ ${eur(r.frais)} de frais comptés (aller simple et retour par la route, quitus fiscal, contrôle technique, carte grise française). Le coût réel comparé à la cote française est donc ${eur(r.coutReel)}.`;
+  } else imp.hidden = true;
+  const visibles = lvl >= 2 ? r.checks.slice(0, 7) : lvl === 1 ? r.checks.slice(0, 1) : [];
+  const caches = lvl >= 2 ? 0 : Math.max(0, Math.min(7, r.checks.length) - visibles.length);
   $("r-checks").innerHTML = visibles.map(c => `<li>${c}</li>`).join("") + (lvl === 0 ? "<li>Point à vérifier sur ce modèle</li><li>Point à vérifier sur ce modèle</li>" : "");
   $("r-more").textContent = lvl === 1 && caches ? `+ ${caches} autres points à vérifier dans le rapport complet` : "";
 
   if (lvl >= 2) {
-    const cible = Math.min(d.prix, Math.max(0, r.max));
-    const plafond = arrondi(cible);
-    const ouverture = arrondi(Math.max(r.vFr * 0.85, cible * 0.92));
-    const derniere = arrondi((ouverture + plafond) / 2);
-    $("n-open").textContent = eur(ouverture); $("n-max").textContent = eur(plafond);
-    const age = YEAR_NOW - d.annee, kmAtt = Math.max(1, age) * 11000;
-    const args = [];
-    if (r.ecart > 0) args.push(`Le prix demandé dépasse d'environ ${eur(r.ecart)} la cote des annonces comparables.`);
-    else args.push(`Le prix est déjà sous la cote d'environ ${eur(-r.ecart)} : négociez surtout les extras et les frais.`);
-    if (d.km > kmAtt * 1.15) args.push(`Kilométrage au-dessus de la moyenne : ${d.km.toLocaleString("fr-FR")} km pour environ ${kmAtt.toLocaleString("fr-FR")} km attendus à cet âge.`);
-    if (age >= 8) args.push(`À ${age} ans, joints de cellule, batteries et pneus sont à surveiller : chaque frais à prévoir se déduit de votre offre.`);
-    if (d.pays === "de") args.push(`Achat en Allemagne : environ ${eur(r.frais)} de frais à votre charge, à déduire du prix.`);
-    args.push(d.vendeur === "part"
-      ? "Entre particuliers, vous n'avez pas la garantie d'un professionnel : ce risque justifie une remise."
-      : "Chez un professionnel, négociez aussi les extras : garantie prolongée, révision, pneus neufs, contrôle d'étanchéité.");
-    args.push("Pas de contrôle d'étanchéité récent avec facture ? Demandez-le avant l'achat, ou déduisez son coût.");
-    $("n-args").innerHTML = args.map(a => `<li>${a}</li>`).join("");
-    const msgs = [
-      ["Premier contact", `Bonjour,\nVotre ${titre} m'intéresse. Avant de me déplacer, pourriez-vous me confirmer le kilométrage exact, la date du dernier contrôle d'étanchéité de la cellule (avec la facture), l'historique d'entretien et la date des pneus ?\nJe suis un acheteur sérieux et disponible rapidement.\nMerci,\n[Prénom]`],
-      ["Proposition après la visite", `Bonjour,\nMerci pour la visite. Au vu des annonces comparables et des frais à prévoir, je peux vous proposer ${eur(ouverture)}, réglés rapidement par virement.\nCette offre vous conviendrait-elle ?\n[Prénom]`],
-      ["Dernière offre", `Bonjour,\nJ'ai bien réfléchi à votre ${titre}. Ma dernière proposition est de ${eur(derniere)} : c'est le maximum que je peux mettre au regard du marché.\nSi cela vous convient, je peux venir le chercher cette semaine.\n[Prénom]`]
-    ];
-    $("n-msgs").innerHTML = msgs.map(([t, m], i) => `<div class="msg-card"><header><strong>${t}</strong><button class="copy" type="button" data-copy="${i}">Copier</button></header><p id="msg-${i}">${m}</p></div>`).join("");
-    $("n-q").innerHTML = ["Avez-vous les factures d'entretien du porteur et de la cellule ?","Quelle est la date du dernier contrôle d'étanchéité, et le taux d'humidité relevé ?","Le véhicule a-t-il eu un sinistre ou une infiltration d'eau ?","Combien de propriétaires, et le contrôle technique est-il à jour ?","Quelle est la date des pneus (code DOT) ?"].map(q => `<li>${q}</li>`).join("");
+    $("n-calc").innerHTML = r.calc.map(([l, v], i) => `<tr><td>${l}</td><td>${i === 0 ? eur(v) : (v >= 0 ? "+ " : "− ") + eur(Math.abs(v))}</td></tr>`).join("")
+      + `<tr class="tot"><td>Cote estimée</td><td>${eur(r.vFr)}</td></tr>`
+      + (r.prov.length || r.frais ? r.prov.map(([l, v]) => `<tr class="prov"><td>${l}</td><td>− ${eur(v)}</td></tr>`).join("") + (r.frais ? `<tr class="prov"><td>Frais d'import</td><td>− ${eur(r.frais)}</td></tr>` : "") + `<tr class="tot"><td>Ce que le véhicule vaut pour vous</td><td>${eur(r.vFr - r.prov.reduce((s, x) => s + x[1], 0) - r.frais)}</td></tr>` : "");
+    $("n-open").textContent = eur(r.ouverture); $("n-last").textContent = eur(r.derniere); $("n-max").textContent = eur(r.plafond);
+    $("n-args").innerHTML = r.args.map(a => `<li>${a}</li>`).join("");
+    $("n-msgs").innerHTML = r.msgs.map(([t, m], i) => `<div class="msg-card"><header><strong>${t}</strong><button class="copy" type="button" data-copy="${i}">Copier</button></header><p id="msg-${i}">${m}</p></div>`).join("");
+    $("n-q").innerHTML = r.questions.map(q => `<li>${q}</li>`).join("");
   } else {
-    $("n-open").textContent = MASQUE; $("n-max").textContent = MASQUE;
+    $("n-calc").innerHTML = '<tr><td>Prix neuf de référence</td><td>•• ••• €</td></tr><tr><td>Décote liée à l\'âge</td><td>•• ••• €</td></tr><tr class="tot"><td>Cote estimée</td><td>•• ••• €</td></tr>';
+    $("n-open").textContent = MASQUE; $("n-last").textContent = MASQUE; $("n-max").textContent = MASQUE;
     $("n-args").innerHTML = "<li>Argument de négociation chiffré</li><li>Argument de négociation chiffré</li><li>Argument de négociation chiffré</li>";
     $("n-msgs").innerHTML = '<div class="msg-card"><header><strong>Message au vendeur</strong></header><p>Bonjour, votre véhicule m\'intéresse, je peux vous proposer un prix…</p></div>'.repeat(2);
     $("n-q").innerHTML = "<li>Question à poser au vendeur</li><li>Question à poser au vendeur</li>";
@@ -1434,7 +1782,7 @@ document.addEventListener("click", async e => {
 
 /* ---------- Enregistrement et espace client ---------- */
 function entrees(){
-  return { type: $("type").value, marque: $("marque").value, autre: $("autre-marque").value.trim(), annee: +$("annee").value, km: +$("km").value, prix: +$("prix").value, vendeur: state.vendeur, pays: state.pays };
+  return { type: $("type").value, marque: $("marque").value, autre: $("autre-marque").value.trim(), annee: +$("annee").value, km: +$("km").value, prix: +$("prix").value, vendeur: state.vendeur, pays: state.pays, opts: optsChoisies() };
 }
 async function sauver(){
   if (!user || !dernierRapport) return;
@@ -1455,9 +1803,10 @@ async function afficherRapports(){
   box.innerHTML = liste.map(r => {
     const d = r.donnees || {}, date = new Date(r.created_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
     const cls = /affaire/i.test(d.verdict) ? "good" : /juste/i.test(d.verdict) ? "warn" : "bad";
-    return `<article class="report"><span class="pill ${cls}" style="justify-self:start">${d.verdict || ""}</span><h3>${r.vehicule}</h3><p class="meta">${date} · ${(d.km || 0).toLocaleString("fr-FR")} km</p><div class="nums"><span>Prix <b>${eur(d.prix || 0)}</b></span><span>Cote <b>${eur(d.cote || 0)}</b></span></div><div class="acts"><button class="btn small" type="button" data-ouvrir="${r.id}">Ouvrir</button><button class="btn small ghost" type="button" data-suppr="${r.id}">Supprimer</button></div></article>`;
+    return `<article class="report"><span class="pill ${cls}" style="justify-self:start">${d.verdict || ""}</span><h3>${r.vehicule}</h3><p class="meta">${date} · ${(d.km || 0).toLocaleString("fr-FR")} km</p><div class="nums"><span>Prix <b>${eur(d.prix || 0)}</b></span><span>Cote <b>${eur(d.cote || 0)}</b></span></div><div class="acts"><button class="btn small" type="button" data-ouvrir="${r.id}">Ouvrir</button><button class="btn small ghost" type="button" data-pdf="${r.id}">PDF</button><button class="btn small ghost" type="button" data-suppr="${r.id}" aria-label="Supprimer">Supprimer</button></div></article>`;
   }).join("");
   box.querySelectorAll("[data-ouvrir]").forEach(b => b.addEventListener("click", () => ouvrirRapport(liste.find(x => x.id == b.dataset.ouvrir))));
+  box.querySelectorAll("[data-pdf]").forEach(b => b.addEventListener("click", () => pdfDepuisSauvegarde(liste.find(x => x.id == b.dataset.pdf), b)));
   box.querySelectorAll("[data-suppr]").forEach(b => b.addEventListener("click", async () => { try { await Compte.supprimer(b.dataset.suppr); afficherRapports(); } catch (err) { b.textContent = "Échec"; } }));
 }
 function ouvrirRapport(r){
@@ -1466,10 +1815,20 @@ function ouvrirRapport(r){
   $("autre-marque").value = d.autre || ""; $("annee").value = d.annee; $("km").value = d.km; $("prix").value = d.prix;
   $("vendeur").querySelector(`[data-v="${d.vendeur || "part"}"]`).click();
   $("pays").querySelector(`[data-v="${d.pays || "fr"}"]`).click();
+  poserOpts(d.opts || []);
   dernierEnregistre = JSON.stringify(entrees());
   analyse();
   if (location.hash === "#estimer") route(); else location.hash = "#estimer";
 }
+function pdfDepuisSauvegarde(rap, bouton){
+  if (!rap) return;
+  const e = rap.donnees || {};
+  const d = { type: e.type, marque: e.marque, autre: e.autre || "", annee: +e.annee, km: +e.km || 0, prix: +e.prix || 0, vendeur: e.vendeur || "part", pays: e.pays || "fr", opts: e.opts || [] };
+  if (!NEUF[d.type] || !MARQUES[d.marque]) { bouton.textContent = "Indisponible"; return; }
+  try { telechargerPdf(d, calcul(d), Math.max(1, niveauRapport(d)), new Date(rap.created_at)); }
+  catch (err) { console.warn(err); bouton.textContent = "Échec"; setTimeout(() => bouton.textContent = "PDF", 2000); }
+}
+$("r-pdf").addEventListener("click", () => { if (dernierRapport) telechargerPdf(dernierRapport.d, dernierRapport.r, niveauRapport()); });
 
 $("lancer").addEventListener("click", async () => {
   analyse();
@@ -1490,6 +1849,7 @@ seg("vendeur", "vendeur"); seg("pays", "pays");
 ["marque","autre-marque","annee","km","prix"].forEach(id => $(id).addEventListener("input", majEtat));
 $("type").addEventListener("input", () => { remplirMarques($("type").value); majEtat(); });
 remplirMarques("");
+construireOpts();
 majEtat();
 
 /* Lecture d'une annonce collée : lien (mots du lien) ou texte libre */
@@ -1518,6 +1878,13 @@ function lireAnnonce(){
   if (an) { $("annee").value = an[1]; found.push("année"); }
   if (/allemagne|germany|deutschland|\.de\b|mobile de/.test(t + " " + raw.toLowerCase())) { $("pays").querySelector('[data-v="de"]').click(); found.push("pays"); }
   if (/\bpro\b|professionnel|concession|garantie/.test(t)) { $("vendeur").querySelector('[data-v="pro"]').click(); found.push("vendeur"); }
+  const optsVues = Object.keys(OPT_KW).filter(k => OPT_KW[k].test(t));
+  if (optsVues.length) { poserOpts([...new Set([...optsChoisies(), ...optsVues])]); $("opts").open = true; found.push("équipements"); }
+  if (!marque && $("type").value) {
+    /* marque hors liste : on la reporte dans « Autre marque » si le texte la cite */
+    const x = AUTRES.find(([re]) => re.test(t));
+    if (x) { $("marque").value = "Autre marque"; $("autre-marque").value = (t.match(x[0]) || [""])[0].replace(/\b\w/g, c => c.toUpperCase()); found.push("marque"); }
+  }
   const missing = ["type","marque","année","kilométrage","prix"].filter(x => !found.includes(x));
   msg.textContent = found.length
     ? "Repéré : " + found.join(", ") + "." + (missing.length ? " À vérifier ou compléter : " + missing.join(", ") + "." : "")
